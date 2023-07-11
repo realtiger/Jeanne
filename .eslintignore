@@ -1,0 +1,5 @@
+*package.json
+*package-lock.json
+**/assets/**/*
+dist
+e2e/**
