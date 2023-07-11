@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-not-found',
-  templateUrl: './not-found.component.html',
+  selector: 'app-user-manager',
+  templateUrl: './user-manager.component.html',
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NotFoundComponent {}
+export class UserManagerComponent {}
