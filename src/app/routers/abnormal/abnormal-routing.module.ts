@@ -5,20 +5,20 @@ import { AbnormalComponent } from './abnormal.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: AbnormalComponent,
-        children: [
-            { path: 'abnormal404', component: NotFoundComponent }
-            // { path: 'abnormal403', component: ForbiddenComponent },
-            // { path: 'abnormal500', component: ServerErrorComponent }
-        ]
-    },
-    { path: '**', redirectTo: 'abnormal404' }
+  {
+    path: '',
+    component: AbnormalComponent,
+    children: [
+      { path: 'abnormal404', component: NotFoundComponent }
+      // { path: 'abnormal403', component: ForbiddenComponent },
+      // { path: 'abnormal500', component: ServerErrorComponent }
+    ]
+  },
+  { path: '**', redirectTo: 'abnormal404' }
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
 export class AbnormalRoutingModule {}

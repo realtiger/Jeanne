@@ -7,14 +7,14 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { RoutersRoutingModule } from './routers-routing.module';
 
 @NgModule({
-    declarations: [DashboardComponent],
-    imports: [BrowserModule, BrowserAnimationsModule, RoutersRoutingModule, DevUIModule]
+  declarations: [DashboardComponent],
+  imports: [BrowserModule, BrowserAnimationsModule, RoutersRoutingModule, DevUIModule]
 })
 export class RoutersModule {
-    constructor(@Optional() @SkipSelf() parentModule: RoutersModule) {
-        const moduleName = 'RoutersModule';
-        if (parentModule) {
-            throw new Error(`${moduleName} has already been loaded. Import Core modules in the AppModule only.`);
-        }
+  constructor(@Optional() @SkipSelf() parentModule: RoutersModule) {
+    const moduleName = 'RoutersModule';
+    if (parentModule) {
+      throw new Error(`${moduleName} has already been loaded. Import Core modules in the AppModule only.`);
     }
+  }
 }

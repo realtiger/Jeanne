@@ -6,7 +6,7 @@ import { AbnormalComponent } from './abnormal.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 @NgModule({
-    declarations: [AbnormalComponent, NotFoundComponent],
-    imports: [CommonModule, AbnormalRoutingModule]
+  declarations: [AbnormalComponent, NotFoundComponent],
+  imports: [CommonModule, AbnormalRoutingModule]
 })
 export class AbnormalModule {}

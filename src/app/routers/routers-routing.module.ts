@@ -7,13 +7,13 @@ import { authGuard } from '../core/services/auth.guard';
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'abnormal', loadChildren: () => import('./abnormal/abnormal.module').then(m => m.AbnormalModule) },
+  { path: 'passport', loadChildren: () => import('./passport/passport.module').then(m => m.PassportModule) },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: '',
     canActivate: [authGuard],
     children: [{ path: 'manage', loadChildren: () => import('./management/management.module').then(m => m.ManagementModule) }]
   },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'passport', loadChildren: () => import('./passport/passport.module').then(m => m.PassportModule) },
   { path: '**', redirectTo: 'abnormal/abnormal404' }
 ];
 

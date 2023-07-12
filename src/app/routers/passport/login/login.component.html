@@ -1,1 +1,73 @@
-<p>login works!</p>
+<div class="login-wrapper">
+  <d-toast [value]="toastMessage"></d-toast>
+  <div class="login-form">
+    <div class="login-logo-wrapper">
+      <div class="login-logo">
+        <span class="logo-image">
+          <img ngSrc="assets/images/passport/login-logo.svg" alt="Logo" height="678" width="678" />
+        </span>
+        <span class="title-text">{{ siteInfo.title }}</span>
+      </div>
+      <span class="sub-title">{{ siteInfo.subTitle }}</span>
+    </div>
+    <div class="login-ways">
+      <d-tabs [(activeTab)]="tabActiveId" type="pills">
+        <d-tab *ngFor="let item of tabItems" [id]="item.id">
+          <ng-template dTabTitle>
+            <span class="tabs-title"> {{ item.title }} </span>
+          </ng-template>
+        </d-tab>
+      </d-tabs>
+
+      <form dForm [layout]="horizontalLayout" [labelSize]="'sm'" (dSubmit)="formSubmit()" [formGroup]="loginForm">
+        <d-form-item>
+          <d-form-label>{{ tabActiveItem.username.title }}：</d-form-label>
+          <d-form-control>
+            <div>
+              <input
+                dTextInput
+                [placeholder]="tabActiveItem.username.placeholder || '请输入' + tabActiveItem.username.title"
+                formControlName="username"
+                [dValidateRules]="tabActiveItem.username.validators || []"
+              />
+            </div>
+          </d-form-control>
+        </d-form-item>
+        <d-form-item>
+          <d-form-label>{{ tabActiveItem.password.title }}：</d-form-label>
+          <d-form-control [suffixTemplate]="suffixTemplate">
+            <input
+              dTextInput
+              [type]="showPassword ? 'text' : 'password'"
+              name="emailPassword"
+              [placeholder]="tabActiveItem.password.placeholder || '请输入' + tabActiveItem.password.title"
+              formControlName="password"
+              [dValidateRules]="tabActiveItem.password.validators || []"
+            />
+          </d-form-control>
+          <ng-template #suffixTemplate>
+            <i
+              [class]="showPassword ? 'icon icon-preview' : 'icon icon-preview-forbidden'"
+              (click)="showPassword = !showPassword"
+              tabindex="0"
+              (keydown.control.alt.h)="showPassword = !showPassword"
+            ></i>
+          </ng-template>
+        </d-form-item>
+        <div class="login-options">
+          <div class="auto-login">
+            <d-toggle formControlName="remember"></d-toggle>
+            <span class="auto-login-text" style="margin-left: 8px">记住一周</span>
+          </div>
+          <span><a href="#">忘记密码</a></span>
+        </div>
+        <button class="submit-button" dFormSubmit>登录</button>
+      </form>
+    </div>
+    <div class="other">
+      <span class="devui-form-span">其它登录方式:</span>
+      <a routerLink="/register">注册账户</a>
+    </div>
+  </div>
+  <app-footer></app-footer>
+</div>
