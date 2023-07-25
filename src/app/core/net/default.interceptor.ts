@@ -47,7 +47,7 @@ export class DefaultInterceptor implements HttpInterceptor {
   private toLogin(url?: string): void {
     this.tokenService.referrer.url = url || this.router.url;
     this.toastService.open({ value: [{ severity: 'error', summary: '未登录或登录已过期，请重新登录。' }], life: 2000 });
-    setTimeout(() => this.router.navigateByUrl(this.tokenService.options.loginUrl));
+    setTimeout(() => this.tokenService.gotoLogin());
   }
 
   //  刷新 Token 请求
@@ -122,51 +122,67 @@ export class DefaultInterceptor implements HttpInterceptor {
       setHeaders['Accept-Language'] = lang;
     }
 
-    const newRequest = request.clone({ url, setHeaders });
+    let newRequest = request.clone({ url, setHeaders });
+
+    let ignored = false;
 
     // 判断白名单
     if (Array.isArray(this.tokenService.options.ignores)) {
       for (const item of this.tokenService.options.ignores) {
-        if (item.test(request.url)) return this.nextHandler(newRequest, next);
+        if (item.test(newRequest.url)) {
+          ignored = true;
+          break;
+        }
       }
     }
 
-    // 判断是否需要添加token
-    const ignoreKey = this.tokenService.options.allowAnonymousKey;
-    let ignored = false;
-    let params = request.params;
-    if (request.params.has(ignoreKey)) {
-      params = request.params.delete(ignoreKey);
-      ignored = true;
-    }
-    const urlArr = request.url.split('?');
-    if (urlArr.length > 1) {
-      const queryStringParams = new HttpParams({ fromString: urlArr[1] });
-      if (queryStringParams.has(ignoreKey)) {
-        const queryString = queryStringParams.delete(ignoreKey).toString();
-        url = queryString.length > 0 ? `${urlArr[0]}?${queryString}` : urlArr[0];
+    if (!ignored) {
+      // 判断是否需要添加token
+      const ignoreKey = this.tokenService.options.allowAnonymousKey;
+      let params = newRequest.params;
+      if (newRequest.params.has(ignoreKey)) {
+        params = newRequest.params.delete(ignoreKey);
         ignored = true;
       }
-    }
-    if (ignored) {
-      return this.nextHandler(newRequest.clone({ params, url }), next);
+      const urlArr = newRequest.url.split('?');
+      if (urlArr.length > 1) {
+        const queryStringParams = new HttpParams({ fromString: urlArr[1] });
+        if (queryStringParams.has(ignoreKey)) {
+          const queryString = queryStringParams.delete(ignoreKey).toString();
+          url = queryString.length > 0 ? `${urlArr[0]}?${queryString}` : urlArr[0];
+          ignored = true;
+        }
+      }
+
+      if (ignored) {
+        newRequest = newRequest.clone({ params, url });
+      }
     }
 
     const token = this.tokenService.token.token || '';
-    if (token.length > 0) {
-      this.toLogin();
-      return new Observable((observer: Observer<HttpEvent<any>>) => {
-        const res = new HttpErrorResponse({
-          url: request.url,
-          headers: request.headers,
-          status: 401,
-          statusText: `来自 auth 的拦截，所请求URL未授权，若是登录API可加入 [url?_allow_anonymous=true] 来表示忽略校验，更多方法请参考： https://ng-alain.com/auth/getting-started#AlainAuthConfig\nThe interception from auth, the requested URL is not authorized. If the login API can add [url?_allow_anonymous=true] to ignore the check, please refer to: https://ng-alain.com/auth/getting-started#AlainAuthConfig`
+
+    // 判断是否需要刷新token
+    // 1. 没有token，但是可以忽略则直接发送请求
+    // 2. 没有token，但是不可以忽略则跳转登录页
+    // 3. 有token，添加token发送请求
+    if (token.length == 0) {
+      if (ignored) {
+        return this.nextHandler(newRequest, next);
+      } else {
+        this.toLogin();
+        return new Observable((observer: Observer<HttpEvent<any>>) => {
+          const res = new HttpErrorResponse({
+            url: newRequest.url,
+            headers: newRequest.headers,
+            status: 401,
+            statusText: `来自 auth 的拦截，所请求URL未授权，若是登录API可加入 [url?_allow_anonymous=true] 来表示忽略校验，更多方法请参考： https://ng-alain.com/auth/getting-started#AlainAuthConfig\nThe interception from auth, the requested URL is not authorized. If the login API can add [url?_allow_anonymous=true] to ignore the check, please refer to: https://ng-alain.com/auth/getting-started#AlainAuthConfig`
+          });
+          observer.error(res);
         });
-        observer.error(res);
-      });
+      }
     }
 
-    request = this.setRequest(request, token);
+    newRequest = this.setRequest(newRequest, token);
     return this.nextHandler(newRequest, next);
   }
 
@@ -179,6 +195,13 @@ export class DefaultInterceptor implements HttpInterceptor {
         }
         // 若一切都正常，则后续操作
         return of(event);
+      }),
+      catchError((err: HttpErrorResponse | Error) => {
+        if (err instanceof HttpErrorResponse) {
+          return this.handleData(err, request, next);
+        } else {
+          throw err;
+        }
       })
     );
   }
@@ -220,43 +243,38 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   // 处理返回数据
   private handleData(event: HttpResponseBase, request: HttpRequest<any>, next: HttpHandler): Observable<any> {
-    this.checkStatus(event);
     // 业务处理：一些通用操作
-    // 510以上的状态码，都是自定义业务错误，需要进行提示
-    if (event.status > 510) {
-      const summary = `请求错误 ${event.status}`;
-      const content = event instanceof HttpResponse ? event.body?.message : event.statusText;
-      this.toastService.open({ value: [{ severity: 'error', summary, content }] });
-    } else {
-      // 处理具体的业务错误
-      switch (event.status) {
-        case 200:
-          if (event instanceof HttpResponse) {
-            const body: UniversalResponse<{}> = event.body;
-            if (body && !body.success) {
-              this.toastService.open({ value: [{ severity: 'error', content: body.message, summary: '请求错误' }] });
-            }
+    this.checkStatus(event);
+    // 处理具体的业务错误
+    switch (event.status) {
+      case 200:
+        // 注意：这里如果抛出异常会被 nextHandler 方法中的 catchError 捕获
+        if (event instanceof HttpResponse) {
+          const body: UniversalResponse<{}> = event.body;
+          if (body && typeof body.success !== 'undefined' && !body.success) {
+            this.toastService.open({ value: [{ severity: 'error', content: body.message, summary: '数据错误' }] });
           }
-          break;
-        case 401:
-          if (this.refreshTokenEnabled && this.refreshTokenType === 're-request') {
-            return this.tryRefreshToken(event, request, next);
-          }
-          this.toLogin();
-          break;
-        case 403:
-        case 404:
-        case 500:
-          //   TODO 跳转异常处理页面
-          // this.goTo(`/exception/${ev.status}?url=${req.urlWithParams}`);
-          break;
-        default:
-          if (event instanceof HttpErrorResponse) {
-            console.warn('未可知错误，大部分是由于后端不支持跨域CORS或无效配置引起', event);
-          }
-          break;
-      }
+        }
+        break;
+      case 401:
+        if (this.refreshTokenEnabled && this.refreshTokenType === 're-request') {
+          return this.tryRefreshToken(event, request, next);
+        }
+        this.toLogin();
+        break;
+      case 403:
+      case 404:
+      case 500:
+        //   TODO 跳转异常处理页面
+        // this.goTo(`/exception/${ev.status}?url=${req.urlWithParams}`);
+        break;
+      default:
+        if (event instanceof HttpErrorResponse) {
+          console.warn('未可知错误，大部分是由于后端不支持跨域CORS或无效配置引起', event);
+        }
+        break;
     }
+
     if (event instanceof HttpErrorResponse) {
       throw event;
     } else {

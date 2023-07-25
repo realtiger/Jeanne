@@ -7,6 +7,7 @@ import { Message } from 'ng-devui/toast/toast.component';
 import { environment } from '../../../../environments/environment';
 import { LoginType } from '../../../../types/passport';
 import { AuthService } from '../../../core/services/auth.service';
+import { StartupService } from '../../../core/services/startup.service';
 import { TokenService } from '../../../core/services/token.service';
 
 interface LoginFieldInfo {
@@ -34,7 +35,7 @@ export class LoginComponent {
   // 全局变量(component 内部使用)
   siteInfo = environment.siteInfo;
   toastMessage: Message[] = [];
-
+  loading = false;
   loginFormRules: { [key: string]: DValidateRules } = {
     usernameRules: {
       validators: [
@@ -88,7 +89,20 @@ export class LoginComponent {
     return this.tabItems.find(item => item.id === this.tabActiveId) || this.tabItems[0];
   }
 
-  constructor(private fb: FormBuilder, private router: Router, private cdr: ChangeDetectorRef, private authService: AuthService, private tokenService: TokenService) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService,
+    private tokenService: TokenService,
+    private startupService: StartupService
+  ) {
+    // 如果已经登录，直接跳转到首页
+    if (this.authService.isUserLoggedIn) {
+      const referrerUrl = this.tokenService.referrer.url || '/';
+      this.router.navigateByUrl(referrerUrl).then();
+    }
+
     this.loginForm = this.fb.group({
       username: [''],
       password: [''],
@@ -97,24 +111,30 @@ export class LoginComponent {
   }
 
   formSubmit() {
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.loading) {
       return;
     }
 
     const { username, password, remember } = this.loginForm.value;
-
+    this.loading = true;
     this.authService.login(username, password, remember, this.tabActiveId).subscribe({
       next: res => {
+        this.loading = false;
         this.tokenService.setToken(res.access_token, res.refresh_token);
-        const referrerUrl = this.tokenService.referrer.url || '/';
-        this.router.navigateByUrl(referrerUrl).then();
+        this.startupService.load().subscribe({
+          next: () => {
+            const referrerUrl = this.tokenService.referrer.url || '/';
+            this.router.navigateByUrl(referrerUrl).then();
+          }
+        });
       },
-      error: () => {
+      error: err => {
+        this.loading = false;
         this.toastMessage = [
           {
             severity: 'error',
-            summary: '登录信息错误',
-            content: '请检查账户信息，输入正确的用户凭证。'
+            summary: '登录失败',
+            content: err.message
           }
         ];
         this.cdr.markForCheck();

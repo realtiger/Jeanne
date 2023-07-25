@@ -1,0 +1,66 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+.layout {
+  min-height: 100%;
+}
+
+/* TODO: 阴影色确定 */
+.layout-wrapper {
+  min-height: 100%;
+
+  & > d-layout {
+    width: 0;
+  }
+
+  .layout-aside-wrapper {
+    display: flex;
+    box-shadow: $devui-shadow-length-connected-overlay $devui-light-shadow;
+    z-index: 100;
+
+    &.sidebar-top {
+      z-index: 101;
+    }
+
+    &.layout-aside-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      overflow-x: hidden;
+
+
+    }
+
+    .layout-sidebar {
+      background-color: $devui-base-bg;
+      border-right: 1px solid $devui-dividing-line;
+    }
+
+    &.no-second-sidebar .layout-sidebar {
+      border-right: none;
+    }
+  }
+
+  .layout-header-wrapper {
+    display: flex;
+    flex-direction: column;
+    box-shadow: $devui-shadow-length-connected-overlay $devui-light-shadow;
+    z-index: 100;
+
+    &.layout-header-fixed {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      right: 0;
+    }
+  }
+
+  .layout-content-wrapper {
+    background-color: $devui-global-bg;
+  }
+
+  .layout-footer-wrapper {
+    padding: 24px 0 20px;
+    background-color: $devui-global-bg;
+  }
+}

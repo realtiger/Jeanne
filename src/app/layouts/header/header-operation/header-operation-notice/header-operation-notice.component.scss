@@ -1,0 +1,145 @@
+@import 'src/styles/common.scss';
+
+.header-notice {
+  min-height: 300px;
+
+  .notice-content {
+    overflow: auto;
+    height: 272px;
+    padding-bottom: 12px;
+  }
+
+  .notice-no-data {
+    height: 272px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .icon {
+      font-size: 2.5rem;
+      color: $devui-text-weak;
+      margin-bottom: 20px;
+    }
+
+    span {
+      color: $devui-text-weak;
+      font-size: $devui-font-size-card-title;
+    }
+  }
+
+  .notice-clear {
+    display: flex;
+    height: 44px;
+    margin-bottom: -4px; /* to balance container */
+    align-items: center;
+    border-top: 1px solid $devui-dividing-line;
+
+    d-button {
+      display: inline-flex;
+      height: 100%;
+      align-items: center;
+
+      &:not(:first-child) {
+        border-left: 1px solid $devui-dividing-line;
+      }
+    }
+
+    :host d-button {
+      & > .devui-btn-text-dark .button-content {
+        color: $devui-text;
+
+        &:hover {
+          color: $devui-brand-active;
+        }
+      }
+    }
+  }
+
+  .notice-container-item {
+    display: flex;
+    padding: 8px 20px;
+    align-items: center;
+    border-bottom: 1px solid $devui-dividing-line;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $devui-list-item-hover-bg;
+    }
+
+    .notice-container-item-left {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 20px;
+    }
+
+    .notice-container-item-title {
+      font-size: $devui-font-size;
+      margin-bottom: 4px;
+    }
+
+    .notice-container-item-time {
+      font-size: $devui-font-size;
+      color: $devui-aide-text;
+    }
+
+    &.notice-checked {
+      background-color: $devui-dividing-line;
+      opacity: 0.3;
+    }
+  }
+
+  .notice-item {
+    .warning {
+      background-color: $devui-warning;
+    }
+
+    .success {
+      background-color: $devui-success;
+    }
+
+    .info {
+      background-color: $devui-info;
+    }
+
+    .notice-item-left {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+
+      .icon {
+        color: $devui-light-text;
+      }
+    }
+  }
+
+  .message-item {
+    .message-item-content {
+      margin-bottom: 4px;
+      color: $devui-aide-text;
+    }
+  }
+
+  .todo-item {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    justify-content: space-between;
+
+    .todo-item-left {
+      margin-right: 12px;
+    }
+  }
+}
+
+:host d-tabs .devui-nav-tabs {
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+:host d-tabs ul li {
+  font-weight: normal;
+}

@@ -1,0 +1,49 @@
+<app-layout>
+  <!-- 侧边栏封装 -->
+  <div
+    class="layout-sidebar"
+    [style]="{
+      width: layoutConfig.sidebar.firstSidebar.width + 'px',
+      zIndex: layoutConfig.sidebar.firstSidebar.zIndex,
+      display: layoutConfig.sidebar.firstSidebar.hidden ? 'none' : null
+    }"
+  >
+    <app-header-logo *ngIf="layoutConfig.mode !== 'headerTop' && !layoutConfig['hideLogo']" [shrink]="isSidebarShrink"></app-header-logo>
+    <app-side-menu *ngIf="!isSidebarShrink" [data]="menu"></app-side-menu>
+    <app-header-navbar *ngIf="isSidebarShrink" [data]="menu" mode="left"></app-header-navbar>
+    <div class="sidebar-tools">
+      <ul class="sidebar-tools-list">
+        <li class="sidebar-tools-item" (click)="sidebarShrink(!isSidebarShrink)" tabindex="0" (keyup.enter)="sidebarShrink(!isSidebarShrink)">
+          <i class="icon" [ngClass]="{ 'icon-fold-bar': !isSidebarShrink, 'icon-unfold-bar': isSidebarShrink }"></i>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 顶部导航封装 -->
+  <div
+    [class.no-logo]="layoutConfig.hideLogo"
+    class="layout-header"
+    [style]="{
+      height: layoutConfig.header.firstHeader.height + 'px',
+      zIndex: layoutConfig.header.firstHeader.zIndex,
+      display: layoutConfig.header.firstHeader.hidden ? 'none' : null
+    }"
+  >
+    <app-header-logo *ngIf="(layoutConfig.mode === 'headerTop' || isSidebarFold) && !layoutConfig['hideLogo']" [shrink]="isSidebarFold"></app-header-logo>
+    <span *ngIf="isSidebarFold" class="header-collapsed-button" (click)="openSideMenuDrawer()" tabindex="0" (keyup.enter)="openSideMenuDrawer()">
+      <i class="icon icon-list-view"></i>
+    </span>
+    <app-header-navbar *ngIf="layoutConfig.id === 'topNav' && !isSidebarFold" [data]="menu" mode="top" style="flex: 1 1 0"></app-header-navbar>
+    <div *ngIf="layoutConfig.id !== 'topNav' || isSidebarFold" style="flex: 1 1 0"></div>
+    <app-header-operation></app-header-operation>
+  </div>
+
+  <!-- 路由内容显示 -->
+  <div>
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- 底部封装 -->
+  <app-footer class="layout-footer" [style]="{ width: layoutConfig.footer.height + 'px', display: layoutConfig.footer.hidden ? 'none' : null }"></app-footer>
+</app-layout>

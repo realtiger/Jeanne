@@ -1,3 +1,54 @@
+import { AccordionMenuItem } from 'ng-devui/accordion/accordion.type';
+
+interface LayoutConfig {
+  id: string;
+  mode: 'sidebarTop' | 'headerTop';
+  header: {
+    // 是否固定头部
+    fixed: boolean;
+    // 头部是否隐藏
+    hidden: boolean;
+    zIndex: number | null;
+    firstHeader: {
+      height: number;
+      hidden: boolean;
+      zIndex: number | null;
+    };
+    secondHeader: {
+      height: number;
+      hidden: boolean;
+      zIndex: number | null;
+    };
+  };
+  sidebar: {
+    // 是否固定侧边栏
+    fixed: boolean;
+    // 侧边栏是否隐藏
+    hidden: boolean;
+    // 侧边栏是否收缩
+    shrink: boolean;
+    zIndex: number | null;
+    // 第一个侧边栏
+    firstSidebar: {
+      width: number;
+      hidden: boolean;
+      zIndex: number | null;
+    };
+    // 第二个侧边栏
+    secondSidebar: {
+      width: number;
+      hidden: boolean;
+      zIndex: number | null;
+    };
+  };
+  footer: {
+    height: number;
+    // 底部是否隐藏
+    hidden: boolean;
+  };
+  hideLogo: boolean;
+}
+
 interface ApiConfig {
   // 指定API前缀
   baseUrl: string;
@@ -31,6 +82,45 @@ interface Environment {
   siteInfo: SiteInfo;
 }
 
+interface MenuData extends AccordionMenuItem {
+  // title: string;
+  // disabled?: boolean;
+  // active?: boolean;
+  // open?: boolean;
+  // loading?: boolean;
+  // children?: MenuData[];
+  // link?: string;
+  // target?: string;
+  // linkType?: 'routerLink' | 'hrefLink' | string;
+  children?: MenuData[];
+  id: number;
+  menuIcon: string;
+  parentId?: number | null;
+  level?: number;
+}
+
+interface MenuDataInResponse {
+  id: number;
+  title: string;
+  link: string;
+  icon: string;
+  parent: number | null;
+  level: number;
+  children?: MenuDataInResponse[];
+}
+
+interface AppDate {
+  app: string;
+  menu: MenuDataInResponse[];
+}
+
+interface User {
+  username: string;
+  gender: string;
+  email: string;
+  phoneNumber: string;
+}
+
 interface UniversalResponse<T> {
   code: string;
   success: boolean;
@@ -50,4 +140,4 @@ interface ListItems<T> {
   pagination: Pagination;
 }
 
-export { Environment, UniversalResponse, ListItems };
+export { LayoutConfig, Environment, UniversalResponse, ListItems, MenuData, MenuDataInResponse, AppDate, User };

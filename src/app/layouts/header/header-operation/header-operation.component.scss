@@ -1,0 +1,104 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+.header-operation {
+  height: 60px;
+  width: 100%;
+  padding: 5px 16px 5px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: $devui-font-size-lg;
+  color: $devui-text;
+}
+
+.router-active {
+  outline: none;
+}
+
+.operations {
+  display: flex;
+  line-height: 60px;
+  align-items: center;
+
+  a {
+    color: $devui-text;
+  }
+
+  a:hover {
+    color: $devui-brand;
+  }
+
+  d-search {
+    margin-right: 32px;
+
+    /* TODO: 修正search组件视觉误差后删除 */
+    margin-top: 0.1em;
+
+    :host .devui-search .devui-search-icon > svg {
+      width: 14px;
+      height: 14px;
+      margin-top: -0.1em;
+    }
+  }
+
+  d-badge {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .icon {
+    font-size: $devui-font-size-lg;
+  }
+
+  .icon.icon-helping {
+    padding-right: 24px;
+    cursor: pointer;
+  }
+
+  .operations-user {
+    outline: none;
+    padding-right: 12px;
+    cursor: pointer;
+
+    .devui-dropdown-menu {
+      width: 120px;
+
+      .icon {
+        font-size: $devui-font-size;
+        margin-right: 8px;
+      }
+    }
+
+    .user-name {
+      margin-left: 8px;
+    }
+  }
+
+  .operations-notice {
+    display: flex;
+    align-items: center;
+    padding-right: 24px;
+    padding-left: 8px;
+    height: 60px;
+    cursor: pointer;
+  }
+}
+
+.operations-user {
+  d-avatar :host .devui-avatar-style {
+    background-color: $devui-brand;
+  }
+}
+
+@media only screen and (max-width: 620px) {
+  .operations-user {
+    .user-name {
+      display: none;
+    }
+  }
+}
+
+

@@ -1,0 +1,6 @@
+<div class="logo" [ngClass]="{ 'logo-shrink': shrink }" (click)="goToHome()" (keyup.enter)="goToHome()" tabindex="0">
+  <span class="logo-img">
+    <img src="/assets/images/logo.svg" alt="Logo" />
+  </span>
+  <span *ngIf="!shrink" class="logo-text">{{ siteTitle }}</span>
+</div>

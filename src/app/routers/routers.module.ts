@@ -5,10 +5,11 @@ import { DevUIModule } from 'ng-devui';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { RoutersRoutingModule } from './routers-routing.module';
+import { LayoutsModule } from '../layouts/layouts.module';
 
 @NgModule({
   declarations: [DashboardComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, RoutersRoutingModule, DevUIModule]
+  imports: [BrowserModule, BrowserAnimationsModule, RoutersRoutingModule, DevUIModule, LayoutsModule]
 })
 export class RoutersModule {
   constructor(@Optional() @SkipSelf() parentModule: RoutersModule) {

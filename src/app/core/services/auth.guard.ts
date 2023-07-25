@@ -10,7 +10,7 @@ export const authGuard: CanActivateFn = (_route, _state) => {
   const router = inject(Router);
   const toastService = inject(ToastService);
 
-  if (!authService.isUserLoggedIn()) {
+  if (!authService.isUserLoggedIn) {
     toastService.open({
       value: [
         {
@@ -21,7 +21,7 @@ export const authGuard: CanActivateFn = (_route, _state) => {
       ],
       life: 2000
     });
-    router.navigate([CONFIG.loginUrl]).then();
+    router.navigateByUrl(CONFIG.auth.loginRouter).then();
     return false;
   }
   return true;

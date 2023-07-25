@@ -1,0 +1,117 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+:host {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav {
+  margin-left: 70px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  .nav-menu {
+    display: flex;
+
+    .nav-item {
+      padding-right: 40px;
+      cursor: pointer;
+
+      &.menu-hidden {
+        display: none;
+      }
+
+      & > span {
+        display: inline-block;
+        line-height: 60px;
+        white-space: nowrap;
+      }
+
+      .nav-title:hover {
+        color: $devui-brand;
+
+        .icon {
+          color: $devui-brand;
+        }
+      }
+
+      .nav-title.active-title {
+        color: $devui-brand;
+        font-weight: 700;
+
+        .icon {
+          color: $devui-brand;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}
+
+.nav.nav-left {
+  width: 100%;
+  margin-left: 0;
+  align-items: flex-start;
+
+  .nav-menu {
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+
+    .nav-item {
+      padding-right: 0;
+
+      & > span {
+        width: 100%;
+        line-height: 48px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.nav-title {
+  display: inline-block;
+  line-height: 60px;
+  white-space: nowrap;
+}
+
+.devui-dropdown-item {
+  width: 100%;
+}
+
+.devui-dropdown-menu {
+  min-width: 120px;
+
+  &.nav-left {
+    left: 4px !important;
+  }
+
+  .active-link {
+    background-color: $devui-list-item-active-bg !important;
+    color: $devui-list-item-active-text !important;
+  }
+
+  & > li > span {
+    height: 36px;
+    padding: 0 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.nav-pack-item-wrapper {
+  padding-right: 40px;
+  cursor: pointer;
+
+  .nav-title.active-title {
+    color: $devui-brand;
+    font-weight: 700;
+  }
+}

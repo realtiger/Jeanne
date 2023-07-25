@@ -61,7 +61,7 @@
           </div>
           <span><a href="#">忘记密码</a></span>
         </div>
-        <button class="submit-button" dFormSubmit>登录</button>
+        <button class="submit-button" dFormSubmit [showLoading]="loading" dLoading [backdrop]="loading" [disabled]="loading" message="正在登录中...">登录</button>
       </form>
     </div>
     <div class="other">
