@@ -3,13 +3,14 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
 import { TokenService } from './token.service';
-import { UniversalResponse, User } from '../../../types/global';
+import { UniversalResponse, User, UserPermission } from '../../../types/global';
 import { LoginResponse, LoginType } from '../../../types/passport';
 import { CONFIG } from '../config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private user: User | null = null;
+  private permissions: UserPermission = {};
 
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
@@ -19,6 +20,14 @@ export class AuthService {
 
   set userInfo(user: User | null) {
     this.user = user;
+  }
+
+  get userPermissions(): UserPermission {
+    return this.permissions;
+  }
+
+  set userPermissions(permissions: UserPermission) {
+    this.permissions = permissions;
   }
 
   get isUserLoggedIn() {
@@ -48,7 +57,7 @@ export class AuthService {
     return this.http.post<UniversalResponse<object>>(CONFIG.auth.logoutUrl, {}).pipe(
       map(res => {
         if (res.success) {
-          this.tokenService.clear();
+          this.cleanToken();
         } else {
           throw new Error(res.message);
         }
@@ -58,5 +67,9 @@ export class AuthService {
 
   gotoLogin() {
     this.tokenService.gotoLogin();
+  }
+
+  cleanToken() {
+    this.tokenService.clear();
   }
 }

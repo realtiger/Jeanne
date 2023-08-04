@@ -44,9 +44,10 @@ export class DefaultInterceptor implements HttpInterceptor {
    */
 
   // 跳转到登录页
-  private toLogin(url?: string): void {
-    this.tokenService.referrer.url = url || this.router.url;
-    this.toastService.open({ value: [{ severity: 'error', summary: '未登录或登录已过期，请重新登录。' }], life: 2000 });
+  private toLogin(url = '', haveToken = false): void {
+    this.tokenService.referrer.url = url.length > 0 ? url : this.router.url;
+    const message = haveToken ? '登录已过期，请重新登录。' : '未登录，请进行登录。';
+    this.toastService.open({ value: [{ severity: 'error', summary: message }], life: 2000 });
     setTimeout(() => this.tokenService.gotoLogin());
   }
 
@@ -69,7 +70,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       return this.refreshToken$.pipe(
         filter(v => !!v),
         take(1),
-        switchMap(() => next.handle(this.reAttachToken(request)))
+        switchMap(() => next.handle(this.setRequest(request, this.tokenService.token.token || '', true)))
       );
     }
     // 3、尝试调用刷新 Token
@@ -84,7 +85,7 @@ export class DefaultInterceptor implements HttpInterceptor {
         // 重新保存新 token
         this.tokenService.setToken(res.access_token, res.refresh_token);
         // 重新发起请求
-        return next.handle(this.reAttachToken(request));
+        return next.handle(this.setRequest(request, this.tokenService.token.token || '', true));
       }),
       catchError(err => {
         this.refreshToking = false;
@@ -92,17 +93,6 @@ export class DefaultInterceptor implements HttpInterceptor {
         throw new Error(err);
       })
     );
-  }
-
-  // 重新附加新 Token 信息，因为已经请求过一遍，所以头信息需要重新进行添加
-  // 这里写死，具体情况需要进行更改
-  private reAttachToken(requeset: HttpRequest<any>): HttpRequest<any> {
-    const token = this.tokenService.token;
-    return requeset.clone({
-      setHeaders: {
-        token: `Bearer ${token}`
-      }
-    });
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -169,7 +159,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       if (ignored) {
         return this.nextHandler(newRequest, next);
       } else {
-        this.toLogin();
+        this.toLogin('', false);
         return new Observable((observer: Observer<HttpEvent<any>>) => {
           const res = new HttpErrorResponse({
             url: newRequest.url,
@@ -206,25 +196,34 @@ export class DefaultInterceptor implements HttpInterceptor {
     );
   }
 
-  setRequest(request: HttpRequest<any>, token: string): HttpRequest<any> {
+  setRequest(request: HttpRequest<any>, token: string, force = false): HttpRequest<any> {
     const options = this.tokenService.options;
     const tokenSendString = options.tokenSendTemplate.replace(/\${(\w+)}/g, token);
 
     switch (options.tokenSendPlace) {
       case 'header': {
-        const setHeaders: { [key: string]: string } = {};
-        setHeaders[options.tokenSendKey] = tokenSendString;
-        request = request.clone({ setHeaders });
+        const currentToken = request.headers.get(options.tokenSendKey) || '';
+        if (currentToken.length === 0 || force) {
+          const setHeaders: { [key: string]: string } = {};
+          setHeaders[options.tokenSendKey] = tokenSendString;
+          request = request.clone({ setHeaders });
+        }
         break;
       }
       case 'body': {
         const body = request.body || {};
-        body[options.tokenSendKey] = token;
-        request = request.clone({ body });
+        const currentToken = body[options.tokenSendKey] || '';
+        if (currentToken.length === 0 || force) {
+          body[options.tokenSendKey] = token;
+          request = request.clone({ body });
+        }
         break;
       }
       case 'url': {
-        request = request.clone({ params: request.params.append(options.tokenSendKey, token) });
+        const currentToken = request.params.get(options.tokenSendKey) || '';
+        if (currentToken.length === 0 || force) {
+          request = request.clone({ params: request.params.append(options.tokenSendKey, token) });
+        }
         break;
       }
     }

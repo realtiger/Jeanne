@@ -1,0 +1,12 @@
+<div class="page-header">
+  <d-breadcrumb>
+    <d-breadcrumb-item *ngFor="let item of breadcrumbList">
+      <a [routerLink]="item.link">
+        <i class="icon" [ngClass]="item.icon" *ngIf="item.icon"></i>
+        {{ item.title }}
+      </a>
+    </d-breadcrumb-item>
+  </d-breadcrumb>
+  <div class="page-header-title"><i *ngIf="titleIcon.length > 0" class="icon" [ngClass]="titleIcon"></i>{{ title }}</div>
+  <div *ngIf="description.length > 0">{{ description }}</div>
+</div>

@@ -45,7 +45,7 @@ export class HeaderOperationComponent {
 
   handleNoticeCount(event: number) {
     this.noticeCount = event;
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   goToLogin(): void {

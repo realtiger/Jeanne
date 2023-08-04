@@ -1,0 +1,13 @@
+<app-page-content
+  [name]="'角色'"
+  [tableColumns]="roleColumns"
+  [showTitleDict]="showTitleDict"
+  [createDefaultData]="createDefaultData"
+  [createFormConfig]="createFormConfig"
+  [updateFormConfig]="updateFormConfig"
+  [detailConfig]="detailConfig"
+  (loadFunc)="loadData($event)"
+  (createFunc)="createRole($event)"
+  (updateFunc)="updateRole($event)"
+  (deleteFunc)="deleteRole($event)"
+></app-page-content>

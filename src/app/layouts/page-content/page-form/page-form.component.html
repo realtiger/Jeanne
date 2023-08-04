@@ -1,0 +1,76 @@
+<form dForm [layout]="formConfigLayout" [labelSize]="formConfigLabelSize" (dSubmit)="submitPlanForm($event)">
+  <d-form-item *ngFor="let item of formConfig.items">
+    <d-form-label [required]="!!item.required">{{ item.label }}：</d-form-label>
+    <d-form-control [extraInfo]="item.extraInfo || ''" [suffixTemplate]="suffixTemplate">
+      <!-- input类型 -->
+      <input dTextInput [name]="item.prop" [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'input'" [dValidateRules]="item.rule || {}" />
+
+      <!-- password类型 -->
+      <input
+        dTextInput
+        [name]="item.prop"
+        [type]="item.showPassword ? 'text' : 'password'"
+        [(ngModel)]="formValue[item.prop]"
+        *ngIf="item.type === 'password'"
+        [dValidateRules]="item.rule || {}"
+      />
+
+      <!-- number类型 -->
+      <d-input-number [name]="item.prop" [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'number'" [dValidateRules]="item.rule || {}" [style]="{ width: '100%' }" />
+
+      <!-- textarea类型 -->
+      <textarea dTextarea [name]="item.prop" [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'textarea'" [dValidateRules]="item.rule || {}" rows="5"></textarea>
+
+      <!-- select类型 -->
+      <d-select
+        *ngIf="item.type === 'select'"
+        [appendToBody]="true"
+        [options]="item.options || []"
+        [name]="item.prop"
+        [(ngModel)]="formValue[item.prop]"
+        [dValidateRules]="item.rule || []"
+        filterKey="label"
+        valueKey="value"
+      ></d-select>
+
+      <!-- datePicker类型 -->
+      <div class="devui-input-group devui-dropdown-origin" *ngIf="item.type === 'datePicker'">
+        <input
+          class="devui-input devui-form-control"
+          placeholder="y/MM/dd"
+          (click)="datePicker.toggle()"
+          [name]="item.prop"
+          [(ngModel)]="formValue[item.prop]"
+          autocomplete="off"
+          dDatepicker
+          appendToBody
+          #datePicker="datepicker"
+          [dValidateRules]="item.rule || []"
+        />
+        <div class="devui-input-group-addon close-icon-wrapper" (click)="datePicker.clearAll()" tabindex="0" (keyup.enter)="datePicker.clearAll()">
+          <i class="icon icon-close"></i>
+        </div>
+        <div class="devui-input-group-addon" (click)="datePicker.toggle()" tabindex="0" (keyup.enter)="datePicker.clearAll()">
+          <i class="icon icon-calendar"></i>
+        </div>
+      </div>
+    </d-form-control>
+
+    <ng-template #suffixTemplate>
+      <i
+        class="icon"
+        [ngClass]="item.showPassword ? 'icon-preview' : 'icon-preview-forbidden'"
+        *ngIf="item.type === 'password'"
+        (click)="item.showPassword = !item.showPassword"
+        tabindex="0"
+        (keyup.enter)="item.showPassword = !item.showPassword"
+      ></i>
+    </ng-template>
+  </d-form-item>
+  <d-form-operation class="form-operation">
+    <d-button style="margin-right: 5px" dFormSubmit [dFormSubmitData]="'submit-button'" [showLoading]="loading" [disabled]="loading">
+      {{ loading ? '正在发送请求......' : '确认' }}
+    </d-button>
+    <d-button bsStyle="common" (click)="cancel()">取消</d-button>
+  </d-form-operation>
+</form>

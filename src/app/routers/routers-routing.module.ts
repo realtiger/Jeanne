@@ -20,7 +20,7 @@ const routes: Routes = [
     path: '',
     component: OverallLayoutComponent,
     canActivate: [authGuard],
-    children: [{ path: 'manage', loadChildren: () => import('./management/management.module').then(m => m.ManagementModule) }]
+    children: [{ path: 'system', loadChildren: () => import('./management/management.module').then(m => m.ManagementModule) }]
   },
   { path: '**', redirectTo: 'abnormal/abnormal404' }
 ];

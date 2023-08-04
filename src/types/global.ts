@@ -80,6 +80,8 @@ interface Environment {
   useHash: boolean;
   // 网站标题以及副标题
   siteInfo: SiteInfo;
+  // 菜单数据
+  menu: MenuData[];
 }
 
 interface MenuData extends AccordionMenuItem {
@@ -93,25 +95,27 @@ interface MenuData extends AccordionMenuItem {
   // target?: string;
   // linkType?: 'routerLink' | 'hrefLink' | string;
   children?: MenuData[];
-  id: number;
-  menuIcon: string;
-  parentId?: number | null;
-  level?: number;
+  menuIcon?: string;
+  // 是否隐藏菜单
+  hidden?: boolean;
+  needPermission?: string[];
 }
 
-interface MenuDataInResponse {
-  id: number;
-  title: string;
-  link: string;
-  icon: string;
-  parent: number | null;
-  level: number;
-  children?: MenuDataInResponse[];
+interface UserPermission {
+  GET?: string[];
+  POST?: string[];
+  PUT?: string[];
+  DELETE?: string[];
+  PATCH?: string[];
+
+  [key: string]: string[] | undefined;
 }
 
 interface AppDate {
   app: string;
-  menu: MenuDataInResponse[];
+  permissions: UserPermission;
+  // 是否已经登录
+  auth: boolean;
 }
 
 interface User {
@@ -119,6 +123,13 @@ interface User {
   gender: string;
   email: string;
   phoneNumber: string;
+}
+
+enum ResponseStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  FROZEN = 'frozen',
+  OBSOLETE = 'obsolete'
 }
 
 interface UniversalResponse<T> {
@@ -140,4 +151,26 @@ interface ListItems<T> {
   pagination: Pagination;
 }
 
-export { LayoutConfig, Environment, UniversalResponse, ListItems, MenuData, MenuDataInResponse, AppDate, User };
+const EmptyListItems: ListItems<never> = {
+  items: [],
+  pagination: {
+    index: 1,
+    limit: 10,
+    offset: 0,
+    total: 0
+  }
+};
+
+interface ListParams {
+  index: number;
+  limit: number;
+  filters?: string[];
+  orders?: string[];
+}
+
+interface LoadDataParams {
+  params: ListParams;
+  callback: (success: boolean, data?: ListItems<any>) => void;
+}
+
+export { LayoutConfig, Environment, UniversalResponse, ListItems, EmptyListItems, MenuData, UserPermission, AppDate, User, ResponseStatus, ListParams, LoadDataParams };

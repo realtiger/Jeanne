@@ -1,0 +1,17 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+.page-header {
+  background-color: $devui-base-bg;
+  padding: 16px 20px;
+  font-size: $devui-font-size-lg;
+
+  &-title {
+    margin: 12px 0 16px;
+    font-size: $devui-font-size-modal-title;
+    font-weight: $devui-font-title-weight;
+
+    i {
+      margin-right: 8px;
+    }
+  }
+}

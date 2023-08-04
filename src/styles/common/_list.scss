@@ -1,3 +1,5 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
 .list-wrap {
   .list-container {
     padding: 16px;
@@ -26,24 +28,20 @@
     }
   }
 
-  .Done {
-    color: $devui-success;
-    font-weight: 600;
-  }
-
-  .Working {
-    color: $devui-warning;
-    font-weight: 600;
-  }
-
-  .Stuck {
-    color: $devui-danger;
-    font-weight: 600;
-  }
-
   .over-flow-ellipsis {
     display: inline-block;
     width: 100%;
+  }
+
+  .devui-tag-item {
+    &.status-active {
+      color: $devui-light-text;
+      background-color: $devui-green-80;
+    }
+    &.status-inactive {
+      color: $devui-light-text;
+      background-color: $devui-red-70;
+    }
   }
 }
 

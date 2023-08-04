@@ -1,17 +1,5 @@
 @import "ng-devui/styles-var/devui-var.scss";
-@import "common/list";
-
-.content-banner {
-  background-color: $devui-base-bg;
-  padding: 16px 20px;
-  font-size: $devui-font-size-lg;
-
-  &-title {
-    margin: 12px 0 16px;
-    font-size: $devui-font-size-modal-title;
-    font-weight: $devui-font-title-weight;
-  }
-}
+@import "common/_list.scss";
 
 .content-wrapper {
   padding: 12px;

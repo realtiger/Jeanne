@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, share } from 'rxjs';
 
-import { MenuData, MenuDataInResponse } from '../../../types/global';
+import { MenuData } from '../../../types/global';
 
 @Injectable({ providedIn: 'root' })
 export class MenuService implements OnDestroy {
@@ -17,52 +17,31 @@ export class MenuService implements OnDestroy {
     return this._change$.pipe(share());
   }
 
-  buildMenu(items: MenuDataInResponse[]): void {
-    this.menuData = [];
-    // const menuNodes: Map<number, MenuData> = new Map<number, MenuData>();
-    // items.forEach(item => {
-    //   menuNodes.set(item.id, this.fixMenu(item));
-    // });
-    // menuNodes.forEach((menuData, _) => {
-    //   if (menuData.parentId) {
-    //     const parent = menuNodes.get(menuData.parentId);
-    //     if (parent) {
-    //       if (parent.children) {
-    //         parent.children.push(menuData);
-    //       } else {
-    //         parent.children = [menuData];
-    //       }
-    //     }
-    //   } else {
-    //     this.menuData.push(menuData);
-    //   }
-    // });
-    items.forEach(item => {
-      this.menuData.push(this.fixMenu(item));
-    });
-
-    console.log(this.menuData);
-    this._change$.next(this.menuData);
-  }
-
-  fixMenu(item: MenuDataInResponse): MenuData {
-    const menu: MenuData = {
-      id: item.id,
-      title: item.title,
-      link: item.link,
-      parentId: item.parent,
-      menuIcon: item.icon,
-      linkType: item.link.startsWith('http') ? 'hrefLink' : 'routerLink'
-    };
-    if (item.children) {
-      const children: MenuData[] = [];
-      item.children.forEach(child => {
-        children.push(this.fixMenu(child));
-      });
-      menu['children'] = children;
+  buildMenu(items: MenuData[], permissions: string[], level = 0): MenuData[] {
+    const menuData: MenuData[] = [];
+    for (const item of items) {
+      const needPermission = item.needPermission || [];
+      // 如果没有权限，就不显示菜单
+      if (needPermission.every(p => permissions.includes(p))) {
+        if (item.children) {
+          const childMenuData = this.buildMenu(item.children, permissions, level + 1);
+          if (childMenuData.length > 0) {
+            item.children = childMenuData;
+          } else {
+            continue;
+          }
+        }
+        menuData.push(item);
+      }
     }
 
-    return menu;
+    // 如果是顶层菜单，就更新菜单数据
+    if (level === 0) {
+      this.menuData = menuData;
+      this._change$.next(this.menuData);
+    }
+
+    return menuData;
   }
 
   ngOnDestroy(): void {
