@@ -53,7 +53,7 @@ export class DefaultInterceptor implements HttpInterceptor {
 
   //  刷新 Token 请求
   private refreshTokenRequest() {
-    const token = this.tokenService.token?.refreshToken || '';
+    const token = this.tokenService.token.enable ? this.tokenService.token.refreshToken || '' : '';
     // 这里将token直接写在请求头中，后端可以根据请求头中的token判断是否需要刷新token，其他系统可能不一样
     return this.http.post<LoginResponse>(this.tokenService.options.refreshUrl, {}, { headers: { Authorization: `Bearer ${token}` } });
   }
@@ -67,15 +67,17 @@ export class DefaultInterceptor implements HttpInterceptor {
     }
     // 2、如果 `refreshToking` 为 `true` 表示已经在请求刷新 Token 中，后续所有请求转入等待状态，直至结果返回后再重新发起请求
     if (this.refreshToking) {
+      const token = this.tokenService.token.enable ? this.tokenService.token.refreshToken || '' : '';
       return this.refreshToken$.pipe(
         filter(v => !!v),
         take(1),
-        switchMap(() => next.handle(this.setRequest(request, this.tokenService.token.token || '', true)))
+        switchMap(() => next.handle(this.setRequest(request, token, true)))
       );
     }
     // 3、尝试调用刷新 Token
     this.refreshToking = true;
     this.refreshToken$.next(null);
+    const token = this.tokenService.token.enable ? this.tokenService.token.refreshToken || '' : '';
 
     return this.refreshTokenRequest().pipe(
       switchMap(res => {
@@ -85,7 +87,7 @@ export class DefaultInterceptor implements HttpInterceptor {
         // 重新保存新 token
         this.tokenService.setToken(res.access_token, res.refresh_token);
         // 重新发起请求
-        return next.handle(this.setRequest(request, this.tokenService.token.token || '', true));
+        return next.handle(this.setRequest(request, token, true));
       }),
       catchError(err => {
         this.refreshToking = false;
@@ -149,7 +151,7 @@ export class DefaultInterceptor implements HttpInterceptor {
       }
     }
 
-    const token = this.tokenService.token.token || '';
+    const token = this.tokenService.token.enable ? this.tokenService.token.token || '' : '';
 
     // 判断是否需要刷新token
     // 1. 没有token，但是可以忽略则直接发送请求

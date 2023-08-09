@@ -16,10 +16,10 @@ interface CreateRole {
 }
 
 interface UpdateRole {
-  name: string;
-  detail: string;
-  status: ResponseStatus;
-  level: number;
+  name?: string;
+  detail?: string;
+  status?: ResponseStatus;
+  level?: number;
 }
 
 export { Role, CreateRole, UpdateRole };

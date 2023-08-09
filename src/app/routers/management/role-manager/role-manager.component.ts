@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { RoleManagerService } from './role-manager.service';
 import { LoadDataParams, ResponseStatus } from '../../../../types/global';
-import { CreateDataParams, DeleteDataParams, DetailConfig, FormConfig, TableColumns, UpdateDataParams } from '../../../../types/layout';
+import { CreateDataParams, DeleteDataParams, DetailConfig, DetailDataParams, FormConfig, TableColumns, UpdateDataParams } from '../../../../types/layout';
 import { CreateRole, UpdateRole } from '../../../../types/management/role-manager';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-role-manager',
@@ -61,15 +62,7 @@ export class RoleManagerComponent {
   };
   updateFormConfig: FormConfig = {
     items: [
-      {
-        label: '姓名',
-        prop: 'name',
-        type: 'input',
-        required: true,
-        rule: {
-          validators: [{ required: true, message: '姓名不能为空' }]
-        }
-      },
+      ...this.createFormConfig.items,
       {
         label: '等级',
         prop: 'level',
@@ -88,51 +81,34 @@ export class RoleManagerComponent {
         options: [
           { label: '启用', value: 'active' },
           { label: '禁用', value: 'inactive' }
-        ]
-      },
-      {
-        label: '角色介绍',
-        prop: 'detail',
-        type: 'textarea'
+        ],
+        helpTips: '超级管理员才可以进行修改'
       }
     ]
   };
   detailConfig: DetailConfig[] = [
-    {
-      label: '角色名称',
-      prop: 'name',
-      type: 'text'
-    },
-    {
-      label: '角色介绍',
-      prop: 'detail',
-      type: 'text'
-    },
+    ...this.updateFormConfig.items,
     {
       label: '创建时间',
       prop: 'create_time',
-      type: 'date',
+      type: 'datePicker',
       dataFmt: 'yyyy-MM-dd HH:mm:ss'
     },
     {
       label: '更新时间',
       prop: 'update_time',
-      type: 'date',
+      type: 'datePicker',
       dataFmt: 'yyyy-MM-dd HH:mm:ss'
-    },
-    {
-      label: '状态',
-      prop: 'status',
-      type: 'text'
-    },
-    {
-      label: '等级',
-      prop: 'level',
-      type: 'text'
     }
   ];
+  optionsEnabled = {
+    create: this.authService.hasPermission('POST', 'system:create-one-role'),
+    update: this.authService.hasPermission('PUT', 'system:update-one-role'),
+    delete: this.authService.hasPermission('DELETE', 'system:delete-one-role'),
+    detail: this.authService.hasPermission('GET', 'system:get-one-role')
+  };
 
-  constructor(private roleManagerService: RoleManagerService) {}
+  constructor(private authService: AuthService, private roleManagerService: RoleManagerService) {}
 
   loadData(params: LoadDataParams) {
     this.roleManagerService.getRoleList(params.params).subscribe({
@@ -162,13 +138,28 @@ export class RoleManagerComponent {
 
   updateRole(params: UpdateDataParams) {
     const body: UpdateRole = {
-      name: typeof params.formData['name'] === 'string' ? params.formData['name'].trim() : '',
-      detail: typeof params.formData['detail'] === 'string' ? params.formData['detail'].trim() : '',
-      level: typeof params.formData['level'] === 'string' ? parseInt(params.formData['level'], 10) : 1,
-      status: ResponseStatus.ACTIVE
+      // name: typeof params.formData['name'] === 'string' ? params.formData['name'].trim() : '',
+      // detail: typeof params.formData['detail'] === 'string' ? params.formData['detail'].trim() : '',
+      // level: typeof params.formData['level'] === 'string' ? parseInt(params.formData['level'], 10) : 1,
+      // status: ResponseStatus.ACTIVE
     };
 
+    if (typeof params.formData['name'] === 'string') {
+      body.name = params.formData['name'].trim();
+    }
+    if (typeof params.formData['detail'] === 'string') {
+      body.detail = params.formData['detail'].trim();
+    }
+    if (typeof params.formData['level'] === 'string') {
+      body.level = parseInt(params.formData['level'], 10);
+    } else if (typeof params.formData['level'] === 'number') {
+      body.level = params.formData['level'];
+    }
+
     switch (params.formData['status']) {
+      case 'active':
+        body.status = ResponseStatus.ACTIVE;
+        break;
       case 'inactive':
         body.status = ResponseStatus.INACTIVE;
         break;
@@ -178,8 +169,8 @@ export class RoleManagerComponent {
       case 'obsolete':
         body.status = ResponseStatus.OBSOLETE;
         break;
-      default:
-        body.status = ResponseStatus.ACTIVE;
+      // default:
+      //   body.status = ResponseStatus.ACTIVE;
     }
 
     this.roleManagerService.updateRole(params.id, body).subscribe({
@@ -194,6 +185,17 @@ export class RoleManagerComponent {
 
   deleteRole(params: DeleteDataParams) {
     this.roleManagerService.deleteRole(params.id).subscribe({
+      next: res => {
+        params.callback(true, res);
+      },
+      error: () => {
+        params.callback(false);
+      }
+    });
+  }
+
+  getRoleDetail(params: DetailDataParams) {
+    this.roleManagerService.getRoleDetail(params.id).subscribe({
       next: res => {
         params.callback(true, res);
       },

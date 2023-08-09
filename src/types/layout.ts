@@ -12,8 +12,10 @@ interface FormConfigItem {
   type: 'input' | 'select' | 'datePicker' | 'textarea' | 'password' | 'number';
   showPassword?: boolean;
   required?: boolean;
+  helpTips?: string;
   extraInfo?: string;
-  options?: Array<{ label: string; value: string } | string>;
+  options?: Array<{ label: string; value: string | boolean } | string>;
+  formatter?: (value: { label: string; value: string | boolean }) => string;
   rule?: DValidateRules;
 }
 
@@ -25,7 +27,7 @@ interface FormConfig {
 }
 
 interface FormData {
-  [key: string]: string | Date;
+  [key: string]: string | Date | boolean;
 }
 
 interface CreateDataParams {
@@ -44,11 +46,10 @@ interface DeleteDataParams {
   callback: (success: boolean, data?: any) => void;
 }
 
-interface DetailConfig {
-  label: string;
-  prop: string;
-  type: 'text' | 'date';
+interface DetailConfig extends FormConfigItem {
   dataFmt?: string;
 }
 
-export { TableColumns, FormConfigItem, FormConfig, FormData, CreateDataParams, UpdateDataParams, DeleteDataParams, DetailConfig };
+type DetailDataParams = DeleteDataParams;
+
+export { TableColumns, FormConfigItem, FormConfig, FormData, CreateDataParams, UpdateDataParams, DeleteDataParams, DetailConfig, DetailDataParams };

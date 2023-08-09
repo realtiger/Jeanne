@@ -40,19 +40,24 @@ export const environment: Environment = {
       menuIcon: 'icon-setting',
       children: [
         {
-          title: '用户管理',
-          link: '/system/user',
-          needPermission: ['system:get-all-user'],
-          menuIcon: 'icon-op-member'
-        },
-        {
           title: '角色管理',
           link: '/system/role',
           needPermission: ['system:get-all-role'],
           menuIcon: 'icon-set-role'
         },
         {
+          title: '用户管理',
+          link: '/system/user',
+          needPermission: ['system:get-all-user'],
+          menuIcon: 'icon-op-member'
+        },
+        {
           title: '权限管理',
+          link: '/system/permission',
+          needPermission: ['system:get-all-permission']
+        },
+        {
+          title: '菜单管理',
           link: '/system/menu',
           needPermission: ['system:get-all-permission']
         }

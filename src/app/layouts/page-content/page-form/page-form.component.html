@@ -1,6 +1,6 @@
 <form dForm [layout]="formConfigLayout" [labelSize]="formConfigLabelSize" (dSubmit)="submitPlanForm($event)">
   <d-form-item *ngFor="let item of formConfig.items">
-    <d-form-label [required]="!!item.required">{{ item.label }}：</d-form-label>
+    <d-form-label [required]="!!item.required" [hasHelp]="!!item.helpTips" [helpTips]="item.helpTips ? item.helpTips : ''">{{ item.label }}：</d-form-label>
     <d-form-control [extraInfo]="item.extraInfo || ''" [suffixTemplate]="suffixTemplate">
       <!-- input类型 -->
       <input dTextInput [name]="item.prop" [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'input'" [dValidateRules]="item.rule || {}" />

@@ -31,8 +31,10 @@ export class AuthService {
   }
 
   get isUserLoggedIn() {
-    return !!this.tokenService.token.token;
+    return !!this.tokenService.token.enable;
   }
+
+  hasPermission = (method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', permission: string) => this.userPermissions[method]?.includes(permission) ?? false;
 
   login(username: string, password: string, remember: boolean, loginType: string | number = LoginType.Account): Observable<LoginResponse> {
     const loginUrl = `${CONFIG.auth.loginUrl}?_allow_anonymous=true`;

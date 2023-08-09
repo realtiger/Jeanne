@@ -19,11 +19,11 @@ export class TokenService {
 
   constructor(private router: Router) {}
 
-  get token(): TokenModel {
+  get token(): Partial<TokenModel> {
     return this.getStore(this.options.storeKey);
   }
 
-  getStore(key: string): TokenModel {
+  getStore(key: string): Partial<TokenModel> {
     return JSON.parse(localStorage.getItem(key) || '{}') || {};
   }
 
@@ -37,12 +37,24 @@ export class TokenService {
   }
 
   setToken(token: string, refreshToken: string, expired = 0): boolean {
-    const tokenData: TokenModel = { token, refreshToken, expired };
+    const tokenData: TokenModel = { token, refreshToken, expired, enable: true };
     return this.setStore(this.options.storeKey, tokenData);
   }
 
+  disableToken() {
+    const token = this.token;
+    const tokenData: TokenModel = {
+      token: token.token || '',
+      refreshToken: token.refreshToken || '',
+      expired: token.expired || 0,
+      enable: false
+    };
+    this.setStore(this.options.storeKey, tokenData);
+  }
+
   clear() {
-    this.removeStore(this.options.storeKey);
+    // this.removeStore(this.options.storeKey);
+    this.disableToken();
   }
 
   gotoLogin() {

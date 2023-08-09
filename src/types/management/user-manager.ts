@@ -11,14 +11,14 @@ interface CreateUserData {
 }
 
 interface UpdateUserData {
-  username: string;
-  name: string;
-  email: string;
-  avatar: string;
-  detail: string;
-  status: ResponseStatus;
-  level: number;
-  superuser: boolean | string;
+  username?: string;
+  name?: string;
+  email?: string;
+  avatar?: string;
+  detail?: string;
+  status?: ResponseStatus;
+  level?: number;
+  superuser?: boolean | string;
 }
 
 interface User {

@@ -1,4 +1,5 @@
 interface TokenModel {
+  enable: boolean;
   token: string | null | undefined;
   refreshToken: string | null | undefined;
   // 过期时间，单位：ms

@@ -14,6 +14,7 @@
           </thead>
           <tbody dTableBody>
             <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex">
+              <!-- 新建用户行 -->
               <tr dTableRow *ngIf="rowIndex === 0">
                 <td dTableCell [attr.colspan]="tableColumns.length + 2">
                   <div *ngIf="!showCreateForm" (click)="openCreateUserForm()" class="cursor-pointer" tabindex="0" (keyup.enter)="openCreateUserForm()">
@@ -33,6 +34,7 @@
                   </div>
                 </td>
               </tr>
+              <!-- 用户信息展示 -->
               <tr dTableRow>
                 <td dTableCell>{{ rowIndex + 1 }}</td>
                 <td dTableCell *ngFor="let column of tableColumns">
@@ -45,8 +47,10 @@
                   <span *ngIf="column.fieldType === 'date'">{{ rowItem[column.field] | date : 'yyyy-MM-dd' }}</span>
                 </td>
                 <td>
-                  <d-button icon="icon-edit" bsStyle="text-dark" title="edit" (click)="openEditUserForm(rowItem)"></d-button>
-                  <d-button icon="icon-delete" bsStyle="text-dark" title="delete" (click)="openDeleteUserForm(rowItem)"></d-button>
+                  <d-button icon="icon-edit" bsStyle="text-dark" title="编辑" (click)="openEditUserForm(rowItem)"></d-button>
+                  <d-button icon="icon-delete" bsStyle="text-dark" title="删除" (click)="openDeleteUserForm(rowItem)"></d-button>
+                  <d-button icon="icon-set-role" bsStyle="text-dark" title="设置角色" (click)="openSetRoleForm(rowItem)"></d-button>
+                  <d-button icon="icon-clear-style" bsStyle="text-dark" title="重置密码" (click)="openResetPasswordForm(rowItem)"></d-button>
                 </td>
               </tr>
             </ng-template>
@@ -74,4 +78,102 @@
 <ng-template #editorTemplate>
   <app-page-form [formConfig]="editFormConfig" [formData]="editDefaultRowData" [loading]="formLoading" (submitted)="editUser($event)" (canceled)="closeEditUserForm()">
   </app-page-form>
+</ng-template>
+
+<ng-template #setRoleTemplate>
+  <div class="select-role">
+    <span>角色：</span>
+    <span *ngFor="let role of userRoles; let last = last"> {{ role.name }}{{ last ? '' : ',' }} </span>
+  </div>
+  <div>
+    <span>可选择角色：</span>
+    <d-data-table [dataSource]="roles" [scrollable]="true">
+      <thead dTableHead>
+        <tr dTableRow>
+          <th dHeadCell>
+            <d-checkbox [(ngModel)]="userRolesAllChecked" (ngModelChange)="checkAllUserRoles()"></d-checkbox>
+          </th>
+          <th dHeadCell>角色名称</th>
+        </tr>
+      </thead>
+      <tbody dTableBody>
+        <ng-template let-rowItem="rowItem">
+          <tr dTableRow>
+            <td dTableCell class="devui-checkable-cell">
+              <d-checkbox [(ngModel)]="rowItem.$checked" (ngModelChange)="checkStatusChange(rowItem)"></d-checkbox>
+            </td>
+            <td dTableCell>{{ rowItem.name }}</td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </d-data-table>
+  </div>
+  <d-pagination
+    [total]="rolesPage.total"
+    [(pageSize)]="rolesPage.limit"
+    [(pageIndex)]="rolesPage.index"
+    [canViewTotal]="true"
+    [canChangePageSize]="true"
+    [canJumpPage]="true"
+    (pageIndexChange)="userRolesPageIndexChange($event)"
+    (pageSizeChange)="userRolesPageSizeChange($event)"
+  ></d-pagination>
+  <d-row [dGutter]="12">
+    <d-col [dSpan]="12">
+      <d-button bsStyle="primary" [disabled]="rolesLoading" (click)="updateUserRoles()" [showLoading]="rolesLoading" width="100%" [style]="{ width: '100%' }">
+        {{ rolesLoading ? '列表加载中...' : '设置' }}
+      </d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button bsStyle="common" (click)="closeSetRoleForm()" width="100%" [style]="{ width: '100%' }">取消</d-button>
+    </d-col>
+  </d-row>
+</ng-template>
+
+<ng-template #resetPasswordTemplate>
+  <div class="reset-password">
+    <div class="reset-password-content">
+      <div class="reset-password-item">
+        <span>新密码：</span>
+        <input
+          dTextInput
+          name="密码"
+          [type]="resetPasswordForm.password.showPassword ? 'text' : 'password'"
+          [(ngModel)]="resetPasswordForm.password.value"
+          [dValidateRules]="resetPasswordForm.password.rule"
+        />
+        <i
+          class="icon"
+          [ngClass]="resetPasswordForm.password.showPassword ? 'icon-preview' : 'icon-preview-forbidden'"
+          (click)="resetPasswordForm.password.showPassword = !resetPasswordForm.password.showPassword"
+          tabindex="0"
+          (keyup.enter)="resetPasswordForm.password.showPassword = !resetPasswordForm.password.showPassword"
+          [style]="{ position: 'absolute', margin: '8px 0 0 -20px' }"
+        ></i>
+      </div>
+      <div class="reset-password-item">
+        <span>确认密码：</span>
+        <input
+          dTextInput
+          name="确认密码"
+          [type]="resetPasswordForm.confirmPassword.showPassword ? 'text' : 'password'"
+          [(ngModel)]="resetPasswordForm.confirmPassword.value"
+          [dValidateRules]="resetPasswordForm.confirmPassword.rule"
+        />
+        <i
+          class="icon"
+          [ngClass]="resetPasswordForm.confirmPassword.showPassword ? 'icon-preview' : 'icon-preview-forbidden'"
+          (click)="resetPasswordForm.confirmPassword.showPassword = !resetPasswordForm.confirmPassword.showPassword"
+          tabindex="0"
+          (keyup.enter)="resetPasswordForm.confirmPassword.showPassword = !resetPasswordForm.confirmPassword.showPassword"
+          [style]="{ position: 'absolute', margin: '8px 0 0 -20px' }"
+        ></i>
+      </div>
+    </div>
+    <div class="reset-password-footer" [style]="{ marginTop: '10px' }">
+      <d-button bsStyle="primary" [disabled]="resetPasswordLoading" (click)="resetPasswordSubmit()" [showLoading]="resetPasswordLoading" width="100%" [style]="{ width: '100%' }">
+        {{ resetPasswordLoading ? '重置中...' : '重置' }}
+      </d-button>
+    </div>
+  </div>
 </ng-template>

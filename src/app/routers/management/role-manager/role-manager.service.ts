@@ -63,4 +63,17 @@ export class RoleManagerService {
       })
     );
   }
+
+  getRoleDetail(id: number) {
+    const url = `/api/admin/role/${id}`;
+    return this.http.get<UniversalResponse<Role>>(url).pipe(
+      map(res => {
+        if (res.success) {
+          return res.data;
+        } else {
+          throw new Error(res.message);
+        }
+      })
+    );
+  }
 }

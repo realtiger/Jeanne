@@ -166,6 +166,7 @@ interface ListParams {
   limit: number;
   filters?: string[];
   orders?: string[];
+  ids?: number[];
 }
 
 interface LoadDataParams {

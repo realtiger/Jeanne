@@ -9,16 +9,20 @@
             <tr dTableRow>
               <th dHeadCell>#</th>
               <th dHeadCell *ngFor="let column of tableColumns"> {{ column.header }} </th>
-              <th dHeadCell>操作</th>
+              <th dHeadCell *ngIf="hasOptionsEnabled()">操作</th>
             </tr>
           </thead>
           <tbody dTableBody>
             <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex">
               <tr dTableRow *ngIf="rowIndex === 0">
-                <td dTableCell [attr.colspan]="tableColumns.length + 2" *ngIf="objectHasKey(createDefaultData)">
+                <td
+                  dTableCell
+                  [attr.colspan]="hasOptionsEnabled() ? tableColumns.length + 2 : tableColumns.length + 1"
+                  *ngIf="createFunc.observed && objectHasKey(createDefaultData) && optionsEnabled.create"
+                >
                   <div *ngIf="!showCreateForm" (click)="openCreateForm()" class="cursor-pointer" tabindex="0" (keyup.enter)="openCreateForm()">
                     <span class="tips-icon icon-add"></span>
-                    <span style="margin-left: 10px">新建用户</span>
+                    <span style="margin-left: 10px">新建{{ showName }}</span>
                   </div>
                   <div *ngIf="showCreateForm" class="edit-padding-fix">
                     <app-page-form
@@ -44,16 +48,22 @@
                   ></d-tag>
                   <span *ngIf="column.fieldType === 'date'">{{ rowItem[column.field] | date : 'yyyy-MM-dd' }}</span>
                 </td>
-                <td>
-                  <d-button icon="icon-property" bsStyle="text-dark" title="property" (click)="openDetailCard(rowItem)" *ngIf="objectHasKey(detailConfig)"></d-button>
+                <td *ngIf="hasOptionsEnabled()">
+                  <d-button
+                    icon="icon-property"
+                    bsStyle="text-dark"
+                    title="property"
+                    (click)="openDetailCard(rowItem)"
+                    *ngIf="objectHasKey(detailConfig) && optionsEnabled.detail"
+                  ></d-button>
                   <d-button
                     icon="icon-edit"
                     bsStyle="text-dark"
                     title="edit"
                     (click)="openUpdateForm(rowItem)"
-                    *ngIf="updateFunc.observed && objectHasKey(updateFormConfig)"
+                    *ngIf="updateFunc.observed && objectHasKey(updateFormConfig) && optionsEnabled.update"
                   ></d-button>
-                  <d-button icon="icon-delete" bsStyle="text-dark" title="delete" (click)="openDeleteForm(rowItem)" *ngIf="deleteFunc.observed"></d-button>
+                  <d-button icon="icon-delete" bsStyle="text-dark" title="delete" (click)="openDeleteForm(rowItem)" *ngIf="deleteFunc.observed && optionsEnabled.delete"></d-button>
                 </td>
               </tr>
             </ng-template>
@@ -85,15 +95,17 @@
 </ng-template>
 
 <ng-template #detailTemplate>
-  <div class="detail-content">
+  <div class="detail-content" *ngIf="selectRecord">
     <d-row *ngFor="let item of detailConfig">
       <d-col [dSpan]="10">
         <span>{{ item.label }}</span>
       </d-col>
       <d-col [dSpan]="14" [ngSwitch]="item.type">
-        <span *ngSwitchCase="'date'">{{ selectRecord[item.prop] | date : item.dataFmt || 'yyyy-MM-dd' }}</span>
-        <span *ngSwitchCase="'text'">{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</span>
+        <span *ngSwitchCase="'datePicker'">{{ selectRecord[item.prop] | date : item.dataFmt || 'yyyy-MM-dd' }}</span>
+        <!-- <span *ngSwitchCase="'text'">{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</span>-->
+        <span *ngSwitchDefault>{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</span>
       </d-col>
     </d-row>
   </div>
+  <div dLoading [loading]="formLoading" [backdrop]="true" *ngIf="!selectRecord"></div>
 </ng-template>

@@ -76,4 +76,34 @@ export class UserManagerService {
       })
     );
   }
+
+  updateUserRoles(userId: number, roleIds: number[]) {
+    const url = `/api/admin/user/${userId}/roles`;
+    return this.http.put<UniversalResponse<User>>(url, { roles: roleIds }).pipe(
+      map(res => {
+        if (res.success) {
+          this.commonToastService.success('更新用户角色成功', '更新用户角色成功');
+          return res.data;
+        } else {
+          this.commonToastService.error('更新用户角色失败', `${res.code}: ${res.message}`);
+          throw new Error(res.message);
+        }
+      })
+    );
+  }
+
+  resetPassword(userId: number, password: string, rePassword: string) {
+    const url = `/api/admin/user/${userId}/reset_password`;
+    return this.http.put<UniversalResponse<User>>(url, { password, re_password: rePassword }).pipe(
+      map(res => {
+        if (res.success) {
+          this.commonToastService.success('重置密码成功', '重置密码成功');
+          return res.data;
+        } else {
+          this.commonToastService.error('重置密码失败', `${res.code}: ${res.message}`);
+          throw new Error(res.message);
+        }
+      })
+    );
+  }
 }

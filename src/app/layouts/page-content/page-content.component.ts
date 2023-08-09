@@ -2,7 +2,14 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { DialogService, ModalComponent, TableWidthConfig } from 'ng-devui';
 
 import { ListItems, ListParams, LoadDataParams } from '../../../types/global';
-import { CreateDataParams, DeleteDataParams, DetailConfig, FormConfig, FormData, TableColumns, UpdateDataParams } from '../../../types/layout';
+import { CreateDataParams, DeleteDataParams, DetailConfig, DetailDataParams, FormConfig, FormData, TableColumns, UpdateDataParams } from '../../../types/layout';
+
+interface OptionsEnabled {
+  create?: boolean;
+  update?: boolean;
+  delete?: boolean;
+  detail?: boolean;
+}
 
 @Component({
   selector: 'app-page-content',
@@ -51,6 +58,12 @@ export class PageContentComponent implements OnInit {
   @Input() tableColumns: TableColumns[] = [];
   @Input() records: any[] = [];
   @Input() showTitleDict: { [key: string]: { [key: string]: string } } = {};
+  @Input() optionsEnabled: OptionsEnabled = {
+    create: false,
+    update: false,
+    delete: false,
+    detail: false
+  };
   @Input() createDefaultData: any = {};
   @Input() createFormConfig: FormConfig = { items: [] };
   @Input() updateFormConfig: FormConfig = { items: [] };
@@ -60,6 +73,7 @@ export class PageContentComponent implements OnInit {
   @Output() createFunc = new EventEmitter<CreateDataParams>();
   @Output() updateFunc = new EventEmitter<UpdateDataParams>();
   @Output() deleteFunc = new EventEmitter<DeleteDataParams>();
+  @Output() detailFunc = new EventEmitter<DetailDataParams>();
 
   loading = false;
   formLoading = false;
@@ -80,28 +94,42 @@ export class PageContentComponent implements OnInit {
     return this.name.length > 0 ? this.name : '记录';
   }
 
-  get recordName(): string {
-    let recordName;
-    if (this.selectRecord) {
-      recordName = this.selectRecord.name || this.selectRecord.title || this.selectRecord.id;
-    }
-
-    // 保证 recordName 为 string 类型
-    if (typeof recordName !== 'string') {
-      recordName = '';
-    }
-
-    return recordName;
-  }
-
   constructor(private cdr: ChangeDetectorRef, private dialogService: DialogService) {}
 
   ngOnInit() {
     this.loadData(this.page.index, this.page.limit);
+    this.optionsEnabled = {
+      create: false,
+      update: false,
+      delete: false,
+      detail: false,
+      ...this.optionsEnabled
+    };
   }
 
   objectHasKey(obj: Object) {
     return Object.keys(obj).length !== 0;
+  }
+
+  hasOptionsEnabled() {
+    return this.optionsEnabled.delete || this.optionsEnabled.update || this.optionsEnabled.detail;
+  }
+
+  recordName(record?: any): string {
+    let recordName;
+    const selectRecord = record || this.selectRecord;
+    if (selectRecord) {
+      recordName = selectRecord.name || selectRecord.title || selectRecord.id;
+    }
+
+    // 保证 recordName 为 string 类型
+    if (typeof recordName === 'number') {
+      recordName = recordName.toString();
+    } else if (typeof recordName !== 'string') {
+      recordName = '';
+    }
+
+    return recordName;
   }
 
   showContentTranslate(field: string, key: string) {
@@ -153,12 +181,10 @@ export class PageContentComponent implements OnInit {
   createRecordCallback(success: boolean) {
     if (success) {
       this.showCreateForm = false;
-      this.formLoading = false;
       this.loadData(this.page.index, this.page.limit);
-    } else {
-      this.formLoading = false;
-      this.cdr.detectChanges();
     }
+    this.formLoading = false;
+    this.cdr.detectChanges();
   }
 
   createRecord(formData: FormData) {
@@ -181,7 +207,7 @@ export class PageContentComponent implements OnInit {
         id: 'edit-dialog',
         width: '600px',
         maxHeight: '600px',
-        title: `编辑${this.showName} - ${this.recordName}`,
+        title: `编辑${this.showName} - ${this.recordName(record)}`,
         contentTemplate: this.editorTemplate,
         backdropCloseable: true,
         buttons: []
@@ -199,7 +225,6 @@ export class PageContentComponent implements OnInit {
   editRecordCallback(success: boolean, data?: any) {
     if (success) {
       this.closeUpdateForm();
-      this.formLoading = false;
       for (const record of this.records) {
         if (record.id === this.selectRecord.id) {
           Object.assign(record, data);
@@ -207,11 +232,20 @@ export class PageContentComponent implements OnInit {
         }
       }
       this.selectRecord = null;
-      this.cdr.detectChanges();
-    } else {
-      this.formLoading = false;
-      this.cdr.detectChanges();
     }
+    this.formLoading = false;
+    this.cdr.detectChanges();
+  }
+
+  diffEditorValueChange(value: FormData) {
+    const data: FormData = {};
+    for (const item of this.updateFormConfig.items) {
+      if (this.selectRecord[item.prop] !== value[item.prop]) {
+        data[item.prop] = value[item.prop];
+      }
+    }
+
+    return data;
   }
 
   editRecord(formData: FormData) {
@@ -220,6 +254,12 @@ export class PageContentComponent implements OnInit {
     }
 
     this.formLoading = true;
+    formData = this.diffEditorValueChange(formData);
+    if (!this.objectHasKey(formData)) {
+      this.formLoading = false;
+      this.editRecordCallback(true, this.selectRecord);
+      return;
+    }
     this.updateFunc.emit({ id: this.selectRecord.id, formData, callback: this.editRecordCallback.bind(this) });
   }
 
@@ -234,7 +274,7 @@ export class PageContentComponent implements OnInit {
       maxHeight: '600px',
       title: `删除${this.showName}`,
       showAnimate: false,
-      content: `确定要删除${this.showName} ${this.recordName} 吗？`,
+      content: `确定要删除${this.showName} ${this.recordName(record)} 吗？`,
       buttons: [
         {
           cssClass: 'danger',
@@ -280,15 +320,32 @@ export class PageContentComponent implements OnInit {
   // ########### delete form end ###########
 
   // ########### detail card begin ###########
+  detailRecordCallback(success: boolean, data?: any) {
+    if (success) {
+      this.selectRecord = data;
+    }
+    this.formLoading = false;
+    this.cdr.detectChanges();
+  }
+
   openDetailCard(record: any) {
-    this.selectRecord = record;
+    this.formLoading = true;
+    if (this.detailFunc.observed) {
+      this.detailFunc.emit({ id: record.id, callback: this.detailRecordCallback.bind(this) });
+    } else {
+      this.selectRecord = record;
+      this.formLoading = false;
+    }
     this.modelRef = this.dialogService.open({
       id: 'detail-dialog',
       width: '600px',
       maxHeight: '600px',
-      title: `查看${this.showName}(${this.recordName})详情`,
+      title: `查看${this.showName}(${this.recordName(record)})详情`,
       contentTemplate: this.detailTemplate,
       backdropCloseable: true,
+      onClose: () => {
+        this.selectRecord = null;
+      },
       buttons: []
     });
   }

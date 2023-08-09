@@ -6,8 +6,10 @@
   [createFormConfig]="createFormConfig"
   [updateFormConfig]="updateFormConfig"
   [detailConfig]="detailConfig"
+  [optionsEnabled]="optionsEnabled"
   (loadFunc)="loadData($event)"
   (createFunc)="createRole($event)"
   (updateFunc)="updateRole($event)"
   (deleteFunc)="deleteRole($event)"
+  (detailFunc)="getRoleDetail($event)"
 ></app-page-content>
