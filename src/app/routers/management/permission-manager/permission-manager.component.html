@@ -1,0 +1,24 @@
+<!--<app-page-content-->
+<!--  [name]="'权限'"-->
+<!--  [tableColumns]="permissionColumns"-->
+<!--  [showTitleDict]="showTitleDict"-->
+<!--  [createDefaultData]="createDefaultData"-->
+<!--  [createFormConfig]="createFormConfig"-->
+<!--  [updateFormConfig]="updateFormConfig"-->
+<!--  [detailConfig]="detailConfig"-->
+<!--  [optionsEnabled]="optionsEnabled"-->
+<!--  (loadFunc)="loadData($event)"-->
+<!--  (createFunc)="createPermission($event)"-->
+<!--  (updateFunc)="updatePermission($event)"-->
+<!--  (deleteFunc)="deletePermission($event)"-->
+<!--  (detailFunc)="getPermissionDetail($event)"-->
+<!--&gt;</app-page-content>-->
+<app-page-content
+  [name]="'权限'"
+  [tableColumns]="permissionColumns"
+  [showTitleDict]="showTitleDict"
+  [detailConfig]="detailConfig"
+  [optionsEnabled]="optionsEnabled"
+  (loadFunc)="loadData($event)"
+  (detailFunc)="getPermissionDetail($event)"
+></app-page-content>

@@ -15,6 +15,10 @@ export const environment: Environment = {
     linkUrl: 'https://example.com',
     presentation: 'Jeanne 是一个通用后台管理系统，它基于 Angular 11 和 DevUI 11.0.0-rc.0 开发。'
   },
+  // 要想显示这些菜单必须在三个地方定义
+  // 1. 这里定义
+  // 2. routeing.module.ts 中定义路由
+  // 3. 后端 permission 中定义权限
   menu: [
     {
       title: '仪表盘',
@@ -55,12 +59,12 @@ export const environment: Environment = {
           title: '权限管理',
           link: '/system/permission',
           needPermission: ['system:get-all-permission']
-        },
-        {
-          title: '菜单管理',
-          link: '/system/menu',
-          needPermission: ['system:get-all-permission']
         }
+        // {
+        //   title: '菜单管理',
+        //   link: '/system/menu',
+        //   needPermission: ['system:get-all-user']
+        // }
       ]
     }
   ]

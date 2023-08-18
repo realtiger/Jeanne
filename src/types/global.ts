@@ -174,4 +174,30 @@ interface LoadDataParams {
   callback: (success: boolean, data?: ListItems<any>) => void;
 }
 
-export { LayoutConfig, Environment, UniversalResponse, ListItems, EmptyListItems, MenuData, UserPermission, AppDate, User, ResponseStatus, ListParams, LoadDataParams };
+interface UpdateAdditionalFields {
+  level?: number;
+  status?: ResponseStatus | string;
+}
+
+interface QueryAdditionalFields extends Required<UpdateAdditionalFields> {
+  id: number;
+  create_time: string;
+  update_time: string;
+}
+
+export {
+  LayoutConfig,
+  Environment,
+  UniversalResponse,
+  ListItems,
+  EmptyListItems,
+  MenuData,
+  UserPermission,
+  AppDate,
+  User,
+  ResponseStatus,
+  ListParams,
+  LoadDataParams,
+  UpdateAdditionalFields,
+  QueryAdditionalFields
+};

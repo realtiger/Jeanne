@@ -112,7 +112,11 @@ export class PageContentComponent implements OnInit {
   }
 
   hasOptionsEnabled() {
-    return this.optionsEnabled.delete || this.optionsEnabled.update || this.optionsEnabled.detail;
+    return (
+      (this.optionsEnabled.delete && this.deleteFunc.observed) ||
+      (this.optionsEnabled.update && this.updateFunc.observed) ||
+      (this.optionsEnabled.detail && this.detailFunc.observed)
+    );
   }
 
   recordName(record?: any): string {
@@ -161,10 +165,12 @@ export class PageContentComponent implements OnInit {
   }
 
   onPageChange(pageIndex: number) {
+    this.page.index = pageIndex;
     this.loadData(pageIndex, this.page.limit);
   }
 
   onSizeChange(pageSize: number) {
+    this.page.limit = pageSize;
     this.loadData(this.page.index, pageSize);
   }
 

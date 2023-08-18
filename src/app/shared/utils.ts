@@ -1,6 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
-import { ListParams } from '../../types/global';
+import { ListParams, ResponseStatus } from '../../types/global';
+import { FormData } from '../../types/layout';
 
 function genHttpParams(listParams: ListParams) {
   let params = new HttpParams().set('index', listParams.index).set('limit', listParams.limit);
@@ -26,4 +27,46 @@ function genHttpParams(listParams: ListParams) {
   return params;
 }
 
-export { genHttpParams };
+function getUpdateParams(formData: FormData, fields: string[]) {
+  const body: any = {};
+  for (const field of fields) {
+    const value = formData[field];
+    if (typeof value === 'undefined') continue;
+
+    if (field === 'level') {
+      if (typeof value === 'string') {
+        body[field] = parseInt(value, 10);
+      } else if (typeof value === 'number') {
+        body[field] = value;
+      }
+    } else if (field === 'status') {
+      switch (value) {
+        case 'active':
+          body.status = ResponseStatus.ACTIVE;
+          break;
+        case 'inactive':
+          body.status = ResponseStatus.INACTIVE;
+          break;
+        case 'frozen':
+          body.status = ResponseStatus.FROZEN;
+          break;
+        case 'obsolete':
+          body.status = ResponseStatus.OBSOLETE;
+          break;
+        // default:
+        //   body.status = ResponseStatus.ACTIVE;
+      }
+    } else {
+      if (typeof value === 'string') {
+        body[field] = value.trim();
+      } else if (typeof value === 'number') {
+        body[field] = value;
+      } else if (typeof value === 'boolean') {
+        body[field] = value;
+      }
+    }
+  }
+  return body;
+}
+
+export { genHttpParams, getUpdateParams };

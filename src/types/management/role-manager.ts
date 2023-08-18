@@ -1,13 +1,8 @@
-import { ResponseStatus } from '../global';
+import { QueryAdditionalFields, UpdateAdditionalFields } from '../global';
 
-interface Role {
-  id: number;
+interface Role extends QueryAdditionalFields {
   name: string;
   detail: string;
-  status: string;
-  create_time: string;
-  update_time: string;
-  level: number;
 }
 
 interface CreateRole {
@@ -15,11 +10,6 @@ interface CreateRole {
   detail: string;
 }
 
-interface UpdateRole {
-  name?: string;
-  detail?: string;
-  status?: ResponseStatus;
-  level?: number;
-}
+interface UpdateRole extends Partial<CreateRole>, UpdateAdditionalFields {}
 
 export { Role, CreateRole, UpdateRole };

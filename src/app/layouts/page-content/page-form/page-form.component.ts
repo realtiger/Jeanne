@@ -8,8 +8,14 @@ import { FormConfig, FormData } from '../../../../types/layout';
   templateUrl: './page-form.component.html',
   styles: [
     `
-      .form-operation.devui-form-operation {
-        margin-left: 115px !important;
+      .form-operation {
+        .devui-form-operation {
+          margin-left: 115px !important;
+        }
+
+        d-col d-button {
+          width: 100%;
+        }
       }
 
       @media only screen and (max-width: 1023px) {
@@ -28,6 +34,7 @@ export class PageFormComponent implements OnInit {
     labelSize: 'sm',
     items: []
   };
+  // 初始化表单数据，只在第一次渲染时使用
   @Input() formData: FormData = {};
   @Input() loading = false;
   @Output() submitted = new EventEmitter();

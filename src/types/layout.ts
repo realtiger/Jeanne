@@ -9,7 +9,7 @@ interface TableColumns {
 interface FormConfigItem {
   label: string;
   prop: string;
-  type: 'input' | 'select' | 'datePicker' | 'textarea' | 'password' | 'number';
+  type: 'input' | 'select' | 'datePicker' | 'textarea' | 'password' | 'number' | 'boolean';
   showPassword?: boolean;
   required?: boolean;
   helpTips?: string;
@@ -27,7 +27,7 @@ interface FormConfig {
 }
 
 interface FormData {
-  [key: string]: string | Date | boolean;
+  [key: string]: string | Date | boolean | number;
 }
 
 interface CreateDataParams {

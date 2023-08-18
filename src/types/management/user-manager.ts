@@ -1,38 +1,26 @@
-import { ResponseStatus } from '../global';
+import { QueryAdditionalFields, UpdateAdditionalFields } from '../global';
 
-interface CreateUserData {
+interface BaseUser {
   username: string;
-  password: string;
-  rePassword: string;
   name: string;
   email: string;
   avatar: string;
   detail: string;
 }
 
-interface UpdateUserData {
-  username?: string;
-  name?: string;
-  email?: string;
-  avatar?: string;
-  detail?: string;
-  status?: ResponseStatus;
-  level?: number;
+interface UserPassword {
+  password: string;
+  rePassword: string;
+}
+
+interface CreateUserData extends BaseUser, UserPassword {}
+
+interface UpdateUserData extends Partial<BaseUser>, UpdateAdditionalFields {
   superuser?: boolean | string;
 }
 
-interface User {
-  username: string;
-  name: string;
-  email: string;
-  avatar: string;
-  detail: string;
-  id: number;
-  level: number;
-  status: ResponseStatus;
+interface User extends BaseUser, QueryAdditionalFields {
   superuser: boolean | string;
-  create_time: string;
-  update_time: string;
   last_login_ip: string;
   last_login_time: string;
   roles: number[];

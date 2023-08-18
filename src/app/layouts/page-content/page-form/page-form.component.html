@@ -18,6 +18,9 @@
       <!-- number类型 -->
       <d-input-number [name]="item.prop" [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'number'" [dValidateRules]="item.rule || {}" [style]="{ width: '100%' }" />
 
+      <!-- boolean类型 -->
+      <d-toggle [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'boolean'" [name]="item.prop"></d-toggle>
+
       <!-- textarea类型 -->
       <textarea dTextarea [name]="item.prop" [(ngModel)]="formValue[item.prop]" *ngIf="item.type === 'textarea'" [dValidateRules]="item.rule || {}" rows="5"></textarea>
 
@@ -68,9 +71,15 @@
     </ng-template>
   </d-form-item>
   <d-form-operation class="form-operation">
-    <d-button style="margin-right: 5px" dFormSubmit [dFormSubmitData]="'submit-button'" [showLoading]="loading" [disabled]="loading">
-      {{ loading ? '正在发送请求......' : '确认' }}
-    </d-button>
-    <d-button bsStyle="common" (click)="cancel()">取消</d-button>
+    <d-row [dGutter]="12">
+      <d-col [dSpan]="12">
+        <d-button dFormSubmit [dFormSubmitData]="'submit-button'" [showLoading]="loading" [disabled]="loading" width="100%">
+          {{ loading ? '正在发送请求......' : '确认' }}
+        </d-button>
+      </d-col>
+      <d-col [dSpan]="12">
+        <d-button bsStyle="common" (click)="cancel()" width="100%">取消</d-button>
+      </d-col>
+    </d-row>
   </d-form-operation>
 </form>

@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { RoleManagerService } from './role-manager.service';
-import { LoadDataParams, ResponseStatus } from '../../../../types/global';
+import { LoadDataParams } from '../../../../types/global';
 import { CreateDataParams, DeleteDataParams, DetailConfig, DetailDataParams, FormConfig, TableColumns, UpdateDataParams } from '../../../../types/layout';
 import { CreateRole, UpdateRole } from '../../../../types/management/role-manager';
 import { AuthService } from '../../../core/services/auth.service';
+import { getUpdateParams } from '../../../shared/utils';
 
 @Component({
   selector: 'app-role-manager',
@@ -137,41 +138,7 @@ export class RoleManagerComponent {
   }
 
   updateRole(params: UpdateDataParams) {
-    const body: UpdateRole = {
-      // name: typeof params.formData['name'] === 'string' ? params.formData['name'].trim() : '',
-      // detail: typeof params.formData['detail'] === 'string' ? params.formData['detail'].trim() : '',
-      // level: typeof params.formData['level'] === 'string' ? parseInt(params.formData['level'], 10) : 1,
-      // status: ResponseStatus.ACTIVE
-    };
-
-    if (typeof params.formData['name'] === 'string') {
-      body.name = params.formData['name'].trim();
-    }
-    if (typeof params.formData['detail'] === 'string') {
-      body.detail = params.formData['detail'].trim();
-    }
-    if (typeof params.formData['level'] === 'string') {
-      body.level = parseInt(params.formData['level'], 10);
-    } else if (typeof params.formData['level'] === 'number') {
-      body.level = params.formData['level'];
-    }
-
-    switch (params.formData['status']) {
-      case 'active':
-        body.status = ResponseStatus.ACTIVE;
-        break;
-      case 'inactive':
-        body.status = ResponseStatus.INACTIVE;
-        break;
-      case 'frozen':
-        body.status = ResponseStatus.FROZEN;
-        break;
-      case 'obsolete':
-        body.status = ResponseStatus.OBSOLETE;
-        break;
-      // default:
-      //   body.status = ResponseStatus.ACTIVE;
-    }
+    const body: UpdateRole = getUpdateParams(params.formData, ['name', 'detail', 'level', 'status']);
 
     this.roleManagerService.updateRole(params.id, body).subscribe({
       next: res => {

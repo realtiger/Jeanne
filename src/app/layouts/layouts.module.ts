@@ -21,7 +21,8 @@ import {
   TabsModule,
   TagsModule,
   TextareaModule,
-  TextInputModule
+  TextInputModule,
+  ToggleModule
 } from 'ng-devui';
 
 import { FooterComponent } from './footer/footer.component';
@@ -78,7 +79,8 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
     InputNumberModule,
     LoadingModule,
     PaginationModule,
-    DataTableModule
+    DataTableModule,
+    ToggleModule
   ],
   providers: [LayoutsService],
   exports: [FooterComponent, OverallLayoutComponent, PageHeaderComponent, PageFormComponent, PageContentComponent]
