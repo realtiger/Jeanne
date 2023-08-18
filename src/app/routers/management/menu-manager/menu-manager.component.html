@@ -1,0 +1,85 @@
+<div class="list-wrap">
+  <app-page-header></app-page-header>
+
+  <div class="content-wrapper" dLoading [loading]="loading" message="菜单树正在加载中......" [backdrop]="true">
+    <!--    <d-row>-->
+    <!--      <d-col [dSpan]="12" dLoading [loading]="loading" message="菜单树正在加载中......" [backdrop]="true">-->
+    <!--        <d-operable-tree [tree]="data" [checkable]="false" (nodeSelected)="selectedNodeChange($event)">-->
+    <!--          <ng-template #statusTemplate let-node="node">-->
+    <!--            <d-badge *ngIf="node.data.data.hidden" count="hidden" status="info"></d-badge>-->
+    <!--          </ng-template>-->
+    <!--          <ng-template #operatorTemplate let-node="node">-->
+    <!--            <div class="op-icon-group">-->
+    <!--              <span class="op-icons icon icon-add" (click)="openCreateModal(node)" tabindex="0" (keyup.enter)="openCreateModal(node)"></span>-->
+    <!--              <span *ngIf="node.id > 0" class="op-icons icon icon-edit" (click)="openEditModal(node)" tabindex="0" (keyup.enter)="openEditModal(node)"></span>-->
+    <!--              <span *ngIf="nodeCanDelete(node)" class="op-icons icon icon-delete" (click)="openDeleteModal(node)" tabindex="0" (keyup.enter)="openDeleteModal(node)"></span>-->
+    <!--            </div>-->
+    <!--          </ng-template>-->
+    <!--        </d-operable-tree>-->
+    <!--      </d-col>-->
+    <!--      <d-col [dSpan]="12">-->
+    <!--        <div class="detail-content" *ngIf="selectedNode && selectedNode.id > 0">-->
+    <!--          <d-row *ngFor="let item of getDetailInfo()">-->
+    <!--            <d-col [dSpan]="10">-->
+    <!--              <span>{{ item.label }}</span>-->
+    <!--            </d-col>-->
+    <!--            <d-col [dSpan]="14">-->
+    <!--              <span>{{ item.value }}</span>-->
+    <!--            </d-col>-->
+    <!--          </d-row>-->
+    <!--        </div>-->
+    <!--      </d-col>-->
+    <!--    </d-row>-->
+    <d-data-table [dataSource]="data" [tableWidthConfig]="tableWidthConfig" [scrollable]="true" tableOverflowType="overlay">
+      <thead dTableHead>
+        <tr dTableRow>
+          <th dHeadCell>菜单名称</th>
+          <th dHeadCell>图标</th>
+          <th dHeadCell>层级</th>
+          <th dHeadCell>状态</th>
+          <th dHeadCell>是否隐藏</th>
+          <th dHeadCell>创建时间</th>
+          <th dHeadCell>更新时间</th>
+          <th dHeadCell>操作</th>
+        </tr>
+      </thead>
+      <tbody dTableBody>
+        <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex" let-nestedLayer="nestedLayer" let-nestedIndex="nestedIndex">
+          <tr dTableRow>
+            <td
+              dTableCell
+              [nestedColumn]="true"
+              [nestedColumnIndent]="20"
+              [rowItem]="rowItem"
+              [nestedLayer]="nestedLayer"
+              (toggleChildTableEvent)="onChildTableToggle($event, rowItem)"
+            >
+              {{ rowItem.title }}
+            </td>
+            <td dTableCell>{{ rowItem.icon }}</td>
+            <td dTableCell>{{ rowItem.level }}</td>
+            <td dTableCell>{{ rowItem.status }}</td>
+            <td dTableCell>{{ rowItem.hidden ? '是' : '否' }}</td>
+            <td dTableCell>{{ rowItem.create_time }}</td>
+            <td dTableCell>{{ rowItem.update_time }}</td>
+            <td dTableCell>
+              <d-button icon="icon-add" bsStyle="text-dark" title="新建" (click)="openCreateModal(rowItem)"></d-button>
+              <d-button *ngIf="rowItem.id > 0" icon="icon-edit" bsStyle="text-dark" title="编辑" (click)="openEditModal(rowItem)"></d-button>
+              <d-button *ngIf="nodeCanDelete(rowItem)" icon="icon-delete" bsStyle="text-dark" title="删除" (click)="openDeleteModal(rowItem)"></d-button>
+            </td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </d-data-table>
+  </div>
+</div>
+
+<ng-template #createTemplate>
+  <app-page-form [formConfig]="createFormConfig" [formData]="createDefaultRowData" [loading]="formLoading" (submitted)="createMenu($event)" (canceled)="closeCreateModal()">
+  </app-page-form>
+</ng-template>
+
+<ng-template #editTemplate>
+  <app-page-form [formConfig]="updateFormConfig" [formData]="updateDefaultRowData" [loading]="formLoading" (submitted)="editMenu($event)" (canceled)="closeEditModal()">
+  </app-page-form>
+</ng-template>

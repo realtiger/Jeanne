@@ -1,0 +1,97 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+
+.layout-sidebar {
+  display: flex;
+  flex-direction: column;
+
+  & > app-side-menu,
+  & > app-header-navbar {
+    flex: 1 1 0;
+    overflow: hidden auto;
+  }
+
+  & > app-header-navbar {
+    margin-top: 10px;
+  }
+
+  & > app-header-logo {
+    display: inline-block;
+  }
+
+  .sidebar-tools {
+    border-top: 1px solid $devui-dividing-line;
+
+    .sidebar-tools-list {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .sidebar-tools-item {
+      width: 54px;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      &:hover {
+        color: $devui-brand;
+      }
+    }
+  }
+}
+
+d-content {
+  padding: 40px;
+  width: calc(100% - 240px);
+  background-color: $devui-global-bg;
+}
+
+:host {
+  .devui-backtop {
+
+    .devui-backtop-content {
+      background-color: $devui-base-bg;
+      color: $devui-text;
+      box-shadow: $devui-shadow-length-feedback-overlay $devui-shadow;
+      opacity: 1;
+
+      svg {
+        width: $devui-font-size-page-title;
+        height: $devui-font-size-page-title;
+
+        path {
+          fill: $devui-text;
+        }
+      }
+
+      &:hover {
+        svg path {
+          fill: $devui-brand;
+        }
+      }
+    }
+  }
+}
+
+.no-logo .header-collapsed-button {
+  margin-left: 16px;
+}
+
+.header-collapsed-button {
+  width: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+.layout-header {
+  display: flex;
+  background-color: $devui-base-bg;
+  border-bottom: 1px solid $devui-dividing-line;
+}
+

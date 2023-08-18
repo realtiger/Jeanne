@@ -1,0 +1,54 @@
+@import 'ng-devui/styles-var/devui-var.scss';
+
+.footer {
+  .footer-intro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .production-name {
+      a {
+        color: $devui-text-weak;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+
+        &:hover {
+          color: $devui-text;
+        }
+      }
+    }
+
+    .organization {
+      a {
+        color: $devui-text-weak;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+
+        &:hover {
+          color: $devui-text;
+        }
+      }
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      svg {
+        fill: $devui-text-weak;
+
+        margin: 0 20px;
+        transition: fill 0.2s ease-in-out;
+
+        &:hover {
+          fill: $devui-text;
+        }
+      }
+    }
+  }
+
+  .presented {
+    text-align: center;
+    color: $devui-text-weak;
+    padding-top: 12px;
+  }
+}

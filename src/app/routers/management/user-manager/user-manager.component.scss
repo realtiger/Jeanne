@@ -1,0 +1,13 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+:host ::ng-deep .devui-tag-item {
+  &.superuser-true {
+    color: $devui-light-text;
+    background-color: $devui-blue-50;
+  }
+
+  &.superuser-false {
+    color: $devui-light-text;
+    background-color: $devui-zinc-70;
+  }
+}

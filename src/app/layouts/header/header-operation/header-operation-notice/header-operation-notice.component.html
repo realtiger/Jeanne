@@ -1,0 +1,113 @@
+<div class="header-notice">
+  <d-tabs [type]="'tabs'" [(activeTab)]="tabActiveID">
+    <d-tab id="notice" [title]="noticeTitle">
+      <ng-template dTabContent>
+        <div class="notice-container">
+          <div class="notice-content" *ngIf="notifications.length; else noData">
+            <div
+              class="notice-item notice-container-item"
+              *ngFor="let notification of notifications"
+              (click)="handleNoticeClick('notice', notification.id)"
+              [ngClass]="{ 'notice-checked': notification.status }"
+              (keyup.enter)="handleNoticeClick('notice', notification.id)"
+              tabindex="0"
+            >
+              <div [class]="'notice-item-left notice-container-item-left ' + notification.type">
+                <i [class]="'icon icon-' + notification.icon"></i>
+                <i [class]="'icon icon-' + notification.icon"></i>
+              </div>
+              <div class="notice-item-right">
+                <div class="notice-item-title notice-container-item-title"> {{ notification.title }} </div>
+                <div class="notice-item-time notice-container-item-time"> {{ notification.time }} </div>
+              </div>
+            </div>
+          </div>
+          <!-- todo 按钮组实现 -->
+          <div class="notice-clear" [ngStyle]="{ visibility: notifications.length ? 'visible' : 'hidden' }">
+            <d-button bsStyle="text-dark" bsPosition="left" [width]="'160px'" (btnClick)="handleClean('notice')"> 清空</d-button>
+            <span class="dividing-line"></span>
+            <d-button bsStyle="text-dark" bsPosition="right" [width]="'160px'">更多</d-button>
+          </div>
+        </div>
+      </ng-template>
+    </d-tab>
+
+    <d-tab id="message" [title]="messageTitle">
+      <ng-template dTabContent>
+        <div class="notice-container">
+          <div class="notice-content" *ngIf="messages.length; else noData">
+            <div
+              class="message-item notice-container-item"
+              *ngFor="let message of messages"
+              (click)="handleNoticeClick('message', message.id)"
+              [ngClass]="{ 'notice-checked': message.status }"
+              tabindex="0"
+              (keyup.enter)="handleNoticeClick('message', message.id)"
+            >
+              <div class="message-item-left notice-container-item-left">
+                <d-avatar [name]="message.title" [width]="30" [height]="30" [imgSrc]="message.image" [isRound]="false"></d-avatar>
+              </div>
+              <div class="message-item-right">
+                <div class="message-item-title notice-container-item-title">
+                  {{ message.title }}
+                </div>
+                <div class="message-item-content">
+                  {{ message.content }}
+                </div>
+                <div class="message-item-time notice-container-item-time">
+                  {{ message.time }}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="notice-clear" [ngStyle]="{ visibility: messages.length ? 'visible' : 'hidden' }">
+            <!-- todo 按钮组实现 -->
+            <d-button bsStyle="text-dark" bsPosition="left" [width]="'160px'" (btnClick)="handleClean('message')"> 清空</d-button>
+            <d-button bsStyle="text-dark" bsPosition="right" [width]="'160px'">更多</d-button>
+          </div>
+        </div>
+      </ng-template>
+    </d-tab>
+
+    <d-tab id="todo" [title]="todoTitle">
+      <ng-template dTabContent>
+        <div class="notice-container">
+          <div class="notice-content" *ngIf="todos.length; else noData">
+            <div
+              class="todo-item notice-container-item"
+              *ngFor="let todo of todos"
+              (click)="handleNoticeClick('todo', todo.id)"
+              [ngClass]="{ 'notice-checked': todo.status }"
+              tabindex="0"
+              (keyup.enter)="handleNoticeClick('todo', todo.id)"
+            >
+              <div class="todo-item-left">
+                <div class="todo-item-title notice-container-item-title">
+                  {{ todo.title }}
+                </div>
+                <div class="todo-item-memo notice-container-item-time">
+                  {{ todo.memo }}
+                </div>
+              </div>
+              <div class="todo-item-right">
+                <d-tag [tag]="todo.tagName" [labelStyle]="todo.tagType"></d-tag>
+              </div>
+            </div>
+          </div>
+          <div class="notice-clear" [ngStyle]="{ visibility: todos.length ? 'visible' : 'hidden' }">
+            <!-- todo 按钮组实现 -->
+            <d-button bsStyle="text-dark" bsPosition="left" [width]="'160px'" (btnClick)="handleClean('todo')"> 清空</d-button>
+            <d-button bsStyle="text-dark" bsPosition="right" [width]="'160px'">更多</d-button>
+          </div>
+        </div>
+      </ng-template>
+    </d-tab>
+  </d-tabs>
+</div>
+
+<ng-template #noData>
+  <div class="notice-no-data">
+    <i class="icon icon-desk-notice"></i>
+    <span>你已经处理完了所有消息</span>
+  </div>
+</ng-template>

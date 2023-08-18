@@ -1,0 +1,63 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+.list-wrap {
+  .list-container {
+    padding: 16px;
+    background-color: $devui-base-bg;
+    border-radius: $devui-border-radius-card;
+    box-shadow: $devui-shadow-length-base $devui-light-shadow;
+    min-width: 80%;
+
+    .list-header {
+      .header-item {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 12px;
+        margin-bottom: 12px;
+      }
+    }
+
+    .list-content {
+      margin-top: 12px;
+      min-height: 200px;
+    }
+
+    .list-footer {
+      text-align: right;
+      margin-top: 12px;
+    }
+  }
+
+  .over-flow-ellipsis {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .devui-tag-item {
+    &.status-active {
+      color: $devui-light-text;
+      background-color: $devui-green-80;
+    }
+    &.status-inactive {
+      color: $devui-light-text;
+      background-color: $devui-red-70;
+    }
+  }
+}
+
+@media only screen and (max-width: 1023px) {
+  .header-item-label {
+    width: 80px;
+  }
+}
+
+:host::ng-deep {
+  @media only screen and (max-width: 1023px) {
+    .devui-pagination {
+      .devui-total-size,
+      .devui-jump-container {
+        display: none !important;
+      }
+    }
+  }
+}

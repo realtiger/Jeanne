@@ -1,0 +1,57 @@
+<d-layout class="layout-wrapper">
+  <!-- d-aside 元素是 fixed 样式，需要额外元素固定高度, element-placeholder表明只是个元素占位，不直接显示样式 -->
+  <div
+    *ngIf="config.sidebar.fixed"
+    class="element-placeholder layout-aside-wrapper"
+    [ngStyle]="{
+      display: config.sidebar.hidden ? 'none' : null,
+      width: getSidebarWidth(),
+      flex: '0 0 ' + getSidebarWidth()
+    }"
+  ></div>
+  <d-aside
+    class="layout-aside-wrapper"
+    [class.no-second-sidebar]="config.sidebar.secondSidebar.hidden"
+    [class.layout-aside-fixed]="config.sidebar.fixed"
+    [class.sidebar-top]="config.mode === 'sidebarTop'"
+    [ngStyle]="{
+      display: config.sidebar.hidden ? 'none' : null,
+      zIndex: config.sidebar.zIndex,
+      paddingTop: config.mode === 'headerTop' ? getHeaderHeight() : 0
+    }"
+  >
+    <ng-content select=".layout-sidebar"></ng-content>
+  </d-aside>
+
+  <d-layout>
+    <!-- d-aside 元素是 fixed 样式，需要额外元素固定高度, element-placeholder表明只是个元素占位，不直接显示样式 -->
+    <div
+      *ngIf="config.header.fixed"
+      class="da-layout-header-wrapper"
+      [ngStyle]="{
+        display: config.header.hidden ? 'none' : null,
+        height: getHeaderHeight()
+      }"
+    ></div>
+    <d-header
+      class="layout-header-wrapper"
+      [class.no-second-header]="config.header.secondHeader.hidden"
+      [class.layout-header-fixed]="config.header.fixed"
+      [ngStyle]="{
+        width: config.header.fixed && config.mode === 'sidebarTop' ? 'calc(100% - ' + getSidebarWidth() + ')' : null,
+        display: config.header.hidden ? 'none' : null,
+        zIndex: config.header.zIndex
+      }"
+    >
+      <ng-content select=".layout-header"></ng-content>
+    </d-header>
+
+    <d-content class="layout-content-wrapper">
+      <ng-content></ng-content>
+    </d-content>
+
+    <d-footer class="layout-footer-wrapper">
+      <ng-content select=".layout-footer"></ng-content>
+    </d-footer>
+  </d-layout>
+</d-layout>
