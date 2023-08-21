@@ -1,27 +1,45 @@
-# Jeanne
+# Jeanne 项目前端
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.2.
+项目通过angular cli v16.1.2 构建，为Jeanne平台提供前端界面，可以通过dockerfile构建docker镜像，运行在容器集群中提供服务。
 
-## Development server
+## 开发服务器
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+如果需要开发，需要安装nodejs环境（项目开发时使用的版本时v18.16.0），推荐使用pnpm进行依赖管理。
 
-## Code scaffolding
+```
+# 查看当前镜像源
+pnpm config get registry
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# 设置淘宝镜像源
+pnpm config set registry https://registry.npmmirror.com
 
-## Build
+# 设置回原来的镜像源
+# pnpm config set registry https://registry.npmjs.org
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+# 安装依赖
+pnpm install
+```
 
-## Running unit tests
+安装完成后，运行`ng serve`启动开发服务器，然后在浏览器中打开 `http://localhost:4600/` ，这里为了开发方便使用了指定的端口号4600。运行服务器后，如果你修改了任何源文件，应用程序将自动重新加载。
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## 构建代码
 
-## Running end-to-end tests
+运行 `ng build` 构建项目。构建完成后的文件将保存在 `dist/` 目录中。使用 `--prod` 标志进行生产构建。
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## 通过 docker 运行开发服务器
 
-## Further help
+首先构建 docker 镜像，然后运行容器，通过对应的端口，就可以通过浏览器访问。
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+docker 构建使用的是 nginx 的基础镜像，后端服务指定 bayonetta ，如果需要修改，可以修改 `{project_root_path}/_nginx/default.conf` 文件。
+
+```
+cd {project_root_path}
+
+# 构建镜像
+# 镜像版本和前端版本一致，都保存在src/environments/environment.ts文件中的version字段
+# 镜像名称和版本号可以自行修改
+# 构筑完成会自动推送到镜像仓库
+bash scripts/build.sh
+```
+
+完成后可以通过 docker 或者 k8s 运行容器，通过对应的端口，就可以通过浏览器访问。
