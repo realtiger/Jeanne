@@ -2,6 +2,7 @@ import { Environment } from '../types/global';
 
 export const environment: Environment = {
   production: true,
+  version: '0.0.1',
   useHash: true,
   api: {
     baseUrl: '/api',

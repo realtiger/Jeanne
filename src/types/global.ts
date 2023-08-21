@@ -74,6 +74,8 @@ interface SiteInfo {
 interface Environment {
   // 是否生产环境
   production: boolean;
+  // 版本信息
+  version: string;
   // API配置
   api: ApiConfig;
   //是否启用 URL 片段（#）代替 history API
