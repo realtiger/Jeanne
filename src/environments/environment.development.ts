@@ -41,8 +41,8 @@ export const environment: Environment = {
       ]
     },
     {
-      title: '系统管理',
-      menuIcon: 'icon-setting',
+      title: '权限管理',
+      menuIcon: 'icon-set-permission',
       children: [
         {
           title: '角色管理',
@@ -61,11 +61,17 @@ export const environment: Environment = {
           link: '/system/permission',
           needPermission: ['system:get-all-permission']
         }
-        // {
-        //   title: '菜单管理',
-        //   link: '/system/menu',
-        //   needPermission: ['system:get-all-user']
-        // }
+      ]
+    },
+    {
+      title: '系统管理',
+      menuIcon: 'icon-setting',
+      children: [
+        {
+          title: '系统日志',
+          link: '/system-manager/system-log',
+          needPermission: ['system:get-one-operation_record']
+        }
       ]
     }
   ]

@@ -1,0 +1,34 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+:host ::ng-deep .devui-tag-item {
+
+  &.method-GET {
+    background-color: $devui-green-80;
+    color: $devui-light-text;
+    box-sizing: border-box;
+  }
+
+  &.method-POST {
+    background-color: $devui-blue-80;
+    color: $devui-light-text;
+    box-sizing: border-box;
+  }
+
+  &.method-PUT {
+    background-color: $devui-orange-80;
+    color: $devui-light-text;
+    box-sizing: border-box;
+  }
+
+  &.method-DELETE {
+    background-color: $devui-red-80;
+    color: $devui-light-text;
+    box-sizing: border-box;
+  }
+
+  &.method-PATCH {
+    background-color: $devui-purple-80;
+    color: $devui-light-text;
+    box-sizing: border-box;
+  }
+}
