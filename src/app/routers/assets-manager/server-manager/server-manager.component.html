@@ -1,0 +1,16 @@
+<app-page-content
+  [name]="'主机'"
+  [tableColumns]="columns"
+  [showTitleDict]="showTitleDict"
+  [createFormConfig]="createFormConfig"
+  [createDefaultData]="createDefaultData"
+  [updateFormConfig]="updateFormConfig"
+  [detailConfig]="detailConfig"
+  [createType]="'modal'"
+  [optionsEnabled]="optionsEnabled"
+  (loadFunc)="loadData($event)"
+  (createFunc)="createServer($event)"
+  (updateFunc)="updateServer($event)"
+  (deleteFunc)="deleteServer($event)"
+  (detailFunc)="getServerDetail($event)"
+></app-page-content>

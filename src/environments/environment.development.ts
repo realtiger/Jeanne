@@ -41,6 +41,17 @@ export const environment: Environment = {
       ]
     },
     {
+      title: '资产管理',
+      menuIcon: 'icon-build-with-tool',
+      children: [
+        {
+          title: '主机管理',
+          link: '/assets-manager/server-manager',
+          needPermission: ['cmdb:get-all-server']
+        }
+      ]
+    },
+    {
       title: '权限管理',
       menuIcon: 'icon-set-permission',
       children: [

@@ -22,7 +22,8 @@ const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'system-manager', loadChildren: () => import('./system-manager/system-manager.module').then(m => m.SystemManagerModule) },
-      { path: 'system', loadChildren: () => import('./management/management.module').then(m => m.ManagementModule) }
+      { path: 'system', loadChildren: () => import('./management/management.module').then(m => m.ManagementModule) },
+      { path: 'assets-manager', loadChildren: () => import('./assets-manager/assets-manager.module').then(m => m.AssetsManagerModule) }
     ]
   },
   { path: '**', redirectTo: 'abnormal/abnormal404' }
