@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
-import { ListParams, ResponseStatus } from '../../types/global';
-import { FormData } from '../../types/layout';
+import { ListParams, LoadDataParams, ResponseStatus } from '../../types/global';
+import { FormData, ServiceWithBaseCrud, TableColumns } from '../../types/layout';
 
 function genHttpParams(listParams: ListParams) {
   let params = new HttpParams().set('index', listParams.index).set('limit', listParams.limit);
@@ -27,19 +27,28 @@ function genHttpParams(listParams: ListParams) {
   return params;
 }
 
-function getUpdateParams(formData: FormData, fields: string[]) {
+function getUpdateParams(formData: FormData, fields: Array<string | { source: string; dest: string }>) {
   const body: any = {};
+  let source = '';
+  let dest = '';
   for (const field of fields) {
-    const value = formData[field];
+    if (typeof field === 'object') {
+      source = field.source;
+      dest = field.dest;
+    } else {
+      source = field;
+      dest = field;
+    }
+    const value = formData[source];
     if (typeof value === 'undefined') continue;
 
-    if (field === 'level') {
+    if (source === 'level') {
       if (typeof value === 'string') {
-        body[field] = parseInt(value, 10);
+        body[dest] = parseInt(value, 10);
       } else if (typeof value === 'number') {
-        body[field] = value;
+        body[dest] = value;
       }
-    } else if (field === 'status') {
+    } else if (source === 'status') {
       switch (value) {
         case 'active':
           body.status = ResponseStatus.ACTIVE;
@@ -58,15 +67,32 @@ function getUpdateParams(formData: FormData, fields: string[]) {
       }
     } else {
       if (typeof value === 'string') {
-        body[field] = value.trim();
+        body[dest] = value.trim();
       } else if (typeof value === 'number') {
-        body[field] = value;
+        body[dest] = value;
       } else if (typeof value === 'boolean') {
-        body[field] = value;
+        body[dest] = value;
       }
     }
   }
   return body;
 }
 
-export { genHttpParams, getUpdateParams };
+class BaseCrudTools {
+  columns: TableColumns[] = [];
+
+  loadData<T extends ServiceWithBaseCrud>(service: T, params: LoadDataParams) {
+    if (service.getRecordList) {
+      service.getRecordList(params.params).subscribe({
+        next: res => {
+          params.callback(true, res);
+        },
+        error: () => {
+          params.callback(false);
+        }
+      });
+    }
+  }
+}
+
+export { genHttpParams, getUpdateParams, BaseCrudTools };

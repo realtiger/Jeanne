@@ -568,7 +568,7 @@ export class UserManagerComponent {
     this.selectUser = row;
     this.rolesLoading = true;
     if (this.selectUser.roles.length > 0) {
-      this.roleManagerService.getRoleList({ index: this.rolesPage.index, limit: this.rolesPage.limit, ids: this.selectUser.roles }).subscribe({
+      this.roleManagerService.getRecordList({ index: this.rolesPage.index, limit: this.rolesPage.limit, ids: this.selectUser.roles }).subscribe({
         next: value => {
           this.userRoles = value.items;
           this.loadRoles();
@@ -600,7 +600,7 @@ export class UserManagerComponent {
 
   loadRoles(index = 1, limit = 10) {
     this.rolesLoading = true;
-    this.roleManagerService.getRoleList({ index, limit }).subscribe({
+    this.roleManagerService.getRecordList({ index, limit }).subscribe({
       next: value => {
         this.rolesLoading = false;
         this.roles = [];
