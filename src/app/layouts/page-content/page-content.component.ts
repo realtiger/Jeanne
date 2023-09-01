@@ -19,37 +19,35 @@ interface OptionsEnabled {
       d-row {
         font-size: 16px;
 
-        d-col:first-child {
+        d-col {
           color: #00000080;
 
-          span {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            position: absolute;
-            width: 100%;
-            text-align: right;
+          &:first-child {
+            div {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              text-align: right;
 
-            &:after {
-              content: ':';
-              margin: 0 8px 0 2px;
+              &:after {
+                content: ':';
+                margin: 0 8px 0 2px;
+              }
             }
           }
         }
       }
 
-      d-col:last-child {
-        color: #000000d9;
-
-        span {
-          width: 100%;
-        }
+      .list-header-operation {
+        display: flex;
+        justify-content: space-between;
       }
     `
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PageContentComponent implements OnInit {
+  @ViewChild('createTemplate', { static: true }) createTemplate: TemplateRef<any> | undefined;
   @ViewChild('editorTemplate', { static: true }) editorTemplate: TemplateRef<any> | undefined;
   @ViewChild('detailTemplate', { static: true }) detailTemplate: TemplateRef<any> | undefined;
   // table 样式配置
@@ -68,6 +66,7 @@ export class PageContentComponent implements OnInit {
   @Input() createFormConfig: FormConfig = { items: [] };
   @Input() updateFormConfig: FormConfig = { items: [] };
   @Input() detailConfig: DetailConfig[] = [];
+  @Input() createType: 'inline' | 'modal' = 'inline';
 
   @Output() loadFunc = new EventEmitter<LoadDataParams>();
   @Output() createFunc = new EventEmitter<CreateDataParams>();
@@ -136,12 +135,19 @@ export class PageContentComponent implements OnInit {
     return recordName;
   }
 
-  showContentTranslate(field: string, key: string) {
-    if (!this.showTitleDict[field]) {
-      return key;
+  showContentTranslate(field: string, sourceValue?: string) {
+    let value;
+
+    if (this.showTitleDict[field]) {
+      value = this.showTitleDict[field][sourceValue || ''] || sourceValue;
+    } else {
+      value = sourceValue;
     }
 
-    return this.showTitleDict[field][key] || key;
+    if (!value || value.length === 0) {
+      value = '--';
+    }
+    return value;
   }
 
   loadDataCallback(success: boolean, res?: ListItems<any>) {
@@ -157,7 +163,7 @@ export class PageContentComponent implements OnInit {
   }
 
   loadData(index: number, limit: number, filters?: string[], orders?: string[]) {
-    if (this.loadFunc) {
+    if (this.loadFunc.observed) {
       this.loading = true;
       const params: ListParams = { index, limit, filters, orders };
       this.loadFunc.emit({ params, callback: this.loadDataCallback.bind(this) });
@@ -182,11 +188,15 @@ export class PageContentComponent implements OnInit {
 
   closeCreateForm() {
     this.showCreateForm = false;
+    if (this.modelRef) {
+      this.modelRef.modalInstance.hide();
+      this.modelRef = null;
+    }
   }
 
   createRecordCallback(success: boolean) {
     if (success) {
-      this.showCreateForm = false;
+      this.closeCreateForm();
       this.loadData(this.page.index, this.page.limit);
     }
     this.formLoading = false;
@@ -196,6 +206,20 @@ export class PageContentComponent implements OnInit {
   createRecord(formData: FormData) {
     this.formLoading = true;
     this.createFunc.emit({ formData, callback: this.createRecordCallback.bind(this) });
+  }
+
+  openCreateCard() {
+    if (this.createTemplate) {
+      this.modelRef = this.dialogService.open({
+        id: 'create-dialog',
+        width: '600px',
+        maxHeight: '800px',
+        title: `新建${this.showName}`,
+        contentTemplate: this.createTemplate,
+        backdropCloseable: true,
+        buttons: []
+      });
+    }
   }
 
   // ########### create form end ###########
@@ -277,7 +301,7 @@ export class PageContentComponent implements OnInit {
     this.modelRef = this.dialogService.open({
       id: 'delete-dialog',
       width: '346px',
-      maxHeight: '600px',
+      maxHeight: '800px',
       title: `删除${this.showName}`,
       showAnimate: false,
       content: `确定要删除${this.showName} ${this.recordName(record)} 吗？`,
@@ -345,7 +369,7 @@ export class PageContentComponent implements OnInit {
     this.modelRef = this.dialogService.open({
       id: 'detail-dialog',
       width: '600px',
-      maxHeight: '600px',
+      maxHeight: '800px',
       title: `查看${this.showName}(${this.recordName(record)})详情`,
       contentTemplate: this.detailTemplate,
       backdropCloseable: true,

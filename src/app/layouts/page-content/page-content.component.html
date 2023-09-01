@@ -3,6 +3,21 @@
 
   <div class="content-wrapper">
     <div class="list-container" dLoading [loading]="loading" [backdrop]="true">
+      <div class="list-header">
+        <div class="list-header-operation">
+          <div class="left"></div>
+          <div class="right">
+            <d-button
+              icon="icon-add"
+              title="新建"
+              (click)="openCreateCard()"
+              *ngIf="createType === 'modal' && createFunc.observed && objectHasKey(createDefaultData) && optionsEnabled.create"
+            >
+              新建{{ showName }}
+            </d-button>
+          </div>
+        </div>
+      </div>
       <div class="list-content">
         <d-data-table [dataSource]="records" [scrollable]="true" [tableWidthConfig]="tableWidthConfig">
           <thead dTableHead>
@@ -14,7 +29,7 @@
           </thead>
           <tbody dTableBody>
             <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex">
-              <tr dTableRow *ngIf="rowIndex === 0">
+              <tr dTableRow *ngIf="createType === 'inline' && rowIndex === 0">
                 <td
                   dTableCell
                   [attr.colspan]="hasOptionsEnabled() ? tableColumns.length + 2 : tableColumns.length + 1"
@@ -51,19 +66,19 @@
                 <td *ngIf="hasOptionsEnabled()">
                   <d-button
                     icon="icon-property"
-                    bsStyle="text-dark"
-                    title="property"
+                    bsStyle="text"
+                    title="详情"
                     (click)="openDetailCard(rowItem)"
                     *ngIf="objectHasKey(detailConfig) && optionsEnabled.detail"
                   ></d-button>
                   <d-button
                     icon="icon-edit"
-                    bsStyle="text-dark"
-                    title="edit"
+                    bsStyle="text"
+                    title="编辑"
                     (click)="openUpdateForm(rowItem)"
                     *ngIf="updateFunc.observed && objectHasKey(updateFormConfig) && optionsEnabled.update"
                   ></d-button>
-                  <d-button icon="icon-delete" bsStyle="text-dark" title="delete" (click)="openDeleteForm(rowItem)" *ngIf="deleteFunc.observed && optionsEnabled.delete"></d-button>
+                  <d-button icon="icon-delete" bsStyle="text" title="删除" (click)="openDeleteForm(rowItem)" *ngIf="deleteFunc.observed && optionsEnabled.delete"></d-button>
                 </td>
               </tr>
             </ng-template>
@@ -89,6 +104,20 @@
   </div>
 </div>
 
+<ng-template #createTemplate>
+  <div class="edit-padding-fix">
+    <app-page-form
+      [formConfig]="createFormConfig"
+      [formData]="createDefaultData"
+      [formValue]="createFormData"
+      [loading]="formLoading"
+      class="editable-row"
+      (submitted)="createRecord($event)"
+      (canceled)="closeCreateForm()"
+    ></app-page-form>
+  </div>
+</ng-template>
+
 <ng-template #editorTemplate>
   <app-page-form [formConfig]="updateFormConfig" [formData]="updateDefaultData" [loading]="formLoading" (submitted)="editRecord($event)" (canceled)="closeUpdateForm()">
   </app-page-form>
@@ -98,12 +127,12 @@
   <div class="detail-content" *ngIf="selectRecord">
     <d-row *ngFor="let item of detailConfig">
       <d-col [dSpan]="10">
-        <span>{{ item.label }}</span>
+        <div>{{ item.label }}</div>
       </d-col>
       <d-col [dSpan]="14" [ngSwitch]="item.type">
-        <span *ngSwitchCase="'datePicker'">{{ selectRecord[item.prop] | date : item.dataFmt || 'yyyy-MM-dd' }}</span>
-        <!-- <span *ngSwitchCase="'text'">{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</span>-->
-        <span *ngSwitchDefault>{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</span>
+        <div *ngSwitchCase="'datePicker'">{{ selectRecord[item.prop] | date : item.dataFmt || 'yyyy-MM-dd' }}</div>
+        <!-- <div *ngSwitchCase="'text'">{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</div>-->
+        <div *ngSwitchDefault>{{ showContentTranslate(item.prop, selectRecord[item.prop]) }}</div>
       </d-col>
     </d-row>
   </div>
