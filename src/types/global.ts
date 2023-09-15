@@ -113,8 +113,14 @@ interface UserPermission {
   [key: string]: string[] | undefined;
 }
 
+interface AppInfo {
+  domain?: {
+    terminal?: string;
+  };
+}
+
 interface AppDate {
-  app: string;
+  app: AppInfo;
   permissions: UserPermission;
   // 是否已经登录
   auth: boolean;
@@ -195,6 +201,7 @@ export {
   EmptyListItems,
   MenuData,
   UserPermission,
+  AppInfo,
   AppDate,
   User,
   ResponseStatus,

@@ -50,6 +50,8 @@ export class PageContentComponent implements OnInit {
   @ViewChild('createTemplate', { static: true }) createTemplate: TemplateRef<any> | undefined;
   @ViewChild('editorTemplate', { static: true }) editorTemplate: TemplateRef<any> | undefined;
   @ViewChild('detailTemplate', { static: true }) detailTemplate: TemplateRef<any> | undefined;
+
+  @Input() operationTpl: TemplateRef<{ $implicit: any }> | null = null;
   // table 样式配置
   @Input() name = '';
   @Input() tableWidthConfig: TableWidthConfig[] = [];

@@ -29,6 +29,7 @@
           </thead>
           <tbody dTableBody>
             <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex">
+              <!-- inline 模式时新建表格的行 -->
               <tr dTableRow *ngIf="createType === 'inline' && rowIndex === 0">
                 <td
                   dTableCell
@@ -52,8 +53,11 @@
                   </div>
                 </td>
               </tr>
+              <!-- 具体内容展示表格的行 -->
               <tr dTableRow>
+                <!-- 当前表格序号的列 -->
                 <td dTableCell>{{ rowIndex + 1 }}</td>
+                <!-- 显示定义tableColumns中对应字段的内容的列 -->
                 <td dTableCell *ngFor="let column of tableColumns">
                   <span *ngIf="column.fieldType === 'text'">{{ showContentTranslate(column.field, rowItem[column.field]) }}</span>
                   <d-tag
@@ -63,6 +67,7 @@
                   ></d-tag>
                   <span *ngIf="column.fieldType === 'date'">{{ rowItem[column.field] | date : 'yyyy-MM-dd' }}</span>
                 </td>
+                <!-- 操作按钮的列 -->
                 <td *ngIf="hasOptionsEnabled()">
                   <d-button
                     icon="icon-property"
@@ -79,6 +84,7 @@
                     *ngIf="updateFunc.observed && objectHasKey(updateFormConfig) && optionsEnabled.update"
                   ></d-button>
                   <d-button icon="icon-delete" bsStyle="text" title="删除" (click)="openDeleteForm(rowItem)" *ngIf="deleteFunc.observed && optionsEnabled.delete"></d-button>
+                  <ng-template [ngTemplateOutlet]="operationTpl" [ngTemplateOutletContext]="{ $implicit: rowItem }"></ng-template>
                 </td>
               </tr>
             </ng-template>
