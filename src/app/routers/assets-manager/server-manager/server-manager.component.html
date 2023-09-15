@@ -8,9 +8,40 @@
   [detailConfig]="detailConfig"
   [createType]="'modal'"
   [optionsEnabled]="optionsEnabled"
+  [operationTpl]="optionTemplate"
   (loadFunc)="loadData($event)"
   (createFunc)="createServer($event)"
   (updateFunc)="updateServer($event)"
   (deleteFunc)="deleteServer($event)"
   (detailFunc)="getServerDetail($event)"
 ></app-page-content>
+
+<ng-template #optionTemplate let-item>
+  <!--  先把 terminal 按钮隐藏 -->
+  <!--  <d-button icon="icon-console" bsStyle="text" title="打开终端" (click)="openTerminal(item)"></d-button>-->
+</ng-template>
+
+<ng-template #terminalContentTemplate>
+  <div>
+    <div class="terminal-header">
+      <div class="terminal-header-title">终端</div>
+      <div class="terminal-header-operation">
+        <!--        <span title="更多" class="icon-more-operate"></span>-->
+        <span
+          title="全屏"
+          (click)="fullScreenTerminal()"
+          [ngClass]="{ 'icon-maxmize': !terminalFullScreen, 'icon-minimize': terminalFullScreen }"
+          (keyup.enter)="fullScreenTerminal()"
+          tabindex="0"
+        ></span>
+        <span (click)="hiddenTerminal()" title="隐藏" class="icon-unfold-bar" (keyup.enter)="hiddenTerminal()" tabindex="0"></span>
+      </div>
+    </div>
+    <div>
+      <d-tabs type="tabs" [scrollMode]="'auto'" [closeable]="true" [(activeTab)]="terminalTabActiveId" (addOrDeleteTabChange)="closeTab($event)">
+        <d-tab *ngFor="let tab of terminalTabs" [id]="tab.id" [title]="tab.title">{{ tab.content }}</d-tab>
+      </d-tabs>
+    </div>
+    <input type="text" class="terminal-input" [(ngModel)]="terminalInput" (keyup.enter)="sendTerminalInput()" />
+  </div>
+</ng-template>

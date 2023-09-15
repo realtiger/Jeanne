@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
-import { ListParams, LoadDataParams, ResponseStatus } from '../../types/global';
-import { FormData, ServiceWithBaseCrud, TableColumns } from '../../types/layout';
+import { ListParams, ResponseStatus } from '../../types/global';
+import { FormData } from '../../types/layout';
 
 function genHttpParams(listParams: ListParams) {
   let params = new HttpParams().set('index', listParams.index).set('limit', listParams.limit);
@@ -78,21 +78,4 @@ function getUpdateParams(formData: FormData, fields: Array<string | { source: st
   return body;
 }
 
-class BaseCrudTools {
-  columns: TableColumns[] = [];
-
-  loadData<T extends ServiceWithBaseCrud>(service: T, params: LoadDataParams) {
-    if (service.getRecordList) {
-      service.getRecordList(params.params).subscribe({
-        next: res => {
-          params.callback(true, res);
-        },
-        error: () => {
-          params.callback(false);
-        }
-      });
-    }
-  }
-}
-
-export { genHttpParams, getUpdateParams, BaseCrudTools };
+export { genHttpParams, getUpdateParams };

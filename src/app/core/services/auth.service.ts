@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
 import { TokenService } from './token.service';
-import { UniversalResponse, User, UserPermission } from '../../../types/global';
+import { AppInfo, UniversalResponse, User, UserPermission } from '../../../types/global';
 import { LoginResponse, LoginType } from '../../../types/passport';
 import { CONFIG } from '../config';
 
@@ -11,6 +11,7 @@ import { CONFIG } from '../config';
 export class AuthService {
   private user: User | null = null;
   private permissions: UserPermission = {};
+  private app: AppInfo = {};
 
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
@@ -28,6 +29,14 @@ export class AuthService {
 
   set userPermissions(permissions: UserPermission) {
     this.permissions = permissions;
+  }
+
+  get appInfo(): AppInfo {
+    return this.app;
+  }
+
+  set appInfo(app: AppInfo) {
+    this.app = app;
   }
 
   get isUserLoggedIn() {

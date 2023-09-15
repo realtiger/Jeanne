@@ -43,6 +43,7 @@ export class StartupService {
           this.menuService.buildMenu(environment.menu, permissions);
           this.authService.userInfo = userInfo.data;
           this.authService.userPermissions = appDate.data.permissions;
+          this.authService.appInfo = appDate.data.app;
         } else {
           let errorMessage = '';
           if (!appDate.success) {

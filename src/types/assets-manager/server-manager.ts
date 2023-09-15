@@ -1,3 +1,4 @@
+import { WebsocketHandler } from '../../app/core/net/websocket-handler';
 import { QueryAdditionalFields, UpdateAdditionalFields } from '../global';
 import { DetailConfig, FormConfig, StatusShowTitleDict, TableColumns } from '../layout';
 
@@ -47,6 +48,11 @@ const ShowTitleDict = {
 const ServerColumns: TableColumns[] = [
   {
     field: 'name',
+    header: '名称',
+    fieldType: 'text'
+  },
+  {
+    field: 'hostname',
     header: '主机名称',
     fieldType: 'text'
   },
@@ -85,12 +91,21 @@ const ServerColumns: TableColumns[] = [
 const ServerCreateFormConfig: FormConfig = {
   items: [
     {
-      label: '主机名称',
+      label: '显示名称',
       prop: 'name',
       type: 'input',
       required: true,
       rule: {
-        validators: [{ required: true, message: '主机名称名称不能为空' }]
+        validators: [{ required: true, message: '主机显示名称不能为空' }]
+      }
+    },
+    {
+      label: '主机名称',
+      prop: 'hostname',
+      type: 'input',
+      required: true,
+      rule: {
+        validators: [{ required: true, message: '主机名称不能为空' }]
       }
     },
     {
@@ -132,11 +147,6 @@ const ServerCreateFormConfig: FormConfig = {
       type: 'input'
     },
     {
-      label: '管理员',
-      prop: 'adminUser',
-      type: 'input'
-    },
-    {
       label: '区域',
       prop: 'region',
       type: 'input'
@@ -151,13 +161,13 @@ const ServerCreateFormConfig: FormConfig = {
 
 const ServerCreateDefaultData = {
   name: '',
+  hostname: '',
   serverType: 'Rack',
   managerIp: '',
   privateIp: '',
   publicIp: '',
   port: 22,
   idc: '',
-  adminUser: '',
   region: '',
   detail: ''
 };
@@ -204,4 +214,22 @@ const ServerDetailConfig: DetailConfig[] = [
   }
 ];
 
-export { Server, CreateServerBody, UpdateServerBody, ServerColumns, ServerCreateDefaultData, ServerCreateFormConfig, ShowTitleDict, ServerUpdateFormConfig, ServerDetailConfig };
+interface TerminalTabItem {
+  id: number;
+  title: string;
+  content: string;
+  ws?: WebsocketHandler;
+}
+
+export {
+  Server,
+  CreateServerBody,
+  UpdateServerBody,
+  ServerColumns,
+  ServerCreateDefaultData,
+  ServerCreateFormConfig,
+  ShowTitleDict,
+  ServerUpdateFormConfig,
+  ServerDetailConfig,
+  TerminalTabItem
+};
