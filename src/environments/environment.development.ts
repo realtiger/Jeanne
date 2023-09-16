@@ -5,6 +5,7 @@ export const environment: Environment = {
   version: '0.0.1',
   useHash: true,
   api: {
+    // 总入口，需要固定，其他入口通过 load_data 接口获取
     baseUrl: 'http://10.209.0.23:5000',
     refreshTokenEnabled: true,
     refreshTokenType: 're-request'
