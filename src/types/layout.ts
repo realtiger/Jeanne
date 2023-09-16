@@ -51,6 +51,11 @@ interface DeleteDataParams {
   callback: Callback;
 }
 
+interface BatchDeleteDataParams {
+  ids: number[];
+  callback: Callback;
+}
+
 interface DetailConfig extends FormConfigItem {
   dataFmt?: string;
 }
@@ -62,6 +67,7 @@ interface ServiceWithBaseCrud {
   createRecord?: (record: any) => Observable<any>;
   updateRecord?: (id: number, record: any) => Observable<any>;
   deleteRecord?: (id: number) => Observable<any>;
+  batchDeleteRecord?: (ids: number[]) => Observable<any>;
   getRecordDetail?: (id: number) => Observable<any>;
 }
 
@@ -72,6 +78,21 @@ const StatusShowTitleDict = {
   }
 };
 
+// 通用的table页面定义
+interface OperationButtonConf {
+  tileMode?: boolean;
+  dropdownMode?: boolean;
+  enabled?: boolean;
+}
+
+interface OperationsEnabled {
+  create?: OperationButtonConf;
+  update?: OperationButtonConf;
+  delete?: OperationButtonConf;
+  batchDelete?: OperationButtonConf;
+  detail?: OperationButtonConf;
+}
+
 export {
   TableColumns,
   FormConfigItem,
@@ -81,8 +102,11 @@ export {
   CreateDataParams,
   UpdateDataParams,
   DeleteDataParams,
+  BatchDeleteDataParams,
   DetailConfig,
   DetailDataParams,
   ServiceWithBaseCrud,
-  StatusShowTitleDict
+  StatusShowTitleDict,
+  OperationsEnabled,
+  OperationButtonConf
 };

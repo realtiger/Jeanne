@@ -29,7 +29,6 @@ export class HeaderOperationComponent {
       case 'logout': {
         this.authService.logout().subscribe({
           next: () => {
-            console.log('退出登录成功');
             this.goToLogin();
           },
           error: err => {

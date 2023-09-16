@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { PermissionManagerService } from './permission-manager.service';
 import { LoadDataParams } from '../../../../types/global';
-import { CreateDataParams, DeleteDataParams, DetailConfig, DetailDataParams, FormConfig, TableColumns, UpdateDataParams } from '../../../../types/layout';
+import { CreateDataParams, DeleteDataParams, DetailConfig, DetailDataParams, FormConfig, OperationsEnabled, TableColumns, UpdateDataParams } from '../../../../types/layout';
 import { CreatePermission, UpdatePermission } from '../../../../types/management/permission-manager';
 import { AuthService } from '../../../core/services/auth.service';
 import { getUpdateParams } from '../../../shared/utils';
@@ -61,11 +61,11 @@ export class PermissionManagerComponent {
       fieldType: 'date'
     }
   ];
-  optionsEnabled = {
-    create: this.authService.hasPermission('POST', 'system:create-one-permission'),
-    update: this.authService.hasPermission('PUT', 'system:update-one-permission'),
-    delete: this.authService.hasPermission('DELETE', 'system:delete-one-permission'),
-    detail: this.authService.hasPermission('GET', 'system:get-one-permission')
+  operationsEnabled: OperationsEnabled = {
+    create: { enabled: this.authService.hasPermission('POST', 'system:create-one-permission') },
+    update: { enabled: this.authService.hasPermission('PUT', 'system:update-one-permission') },
+    delete: { enabled: this.authService.hasPermission('DELETE', 'system:delete-one-permission') },
+    detail: { enabled: this.authService.hasPermission('GET', 'system:get-one-permission') }
   };
 
   createDefaultData = { title: '', url: '', method: 'GET', code: '' };

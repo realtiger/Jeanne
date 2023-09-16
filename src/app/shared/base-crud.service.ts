@@ -66,6 +66,20 @@ export class BaseCrudService {
     );
   }
 
+  batchDeleteRecord<T>(url: string, ids: number[]) {
+    const body = ids;
+
+    return this.http.delete<UniversalResponse<T>>(url, { body }).pipe(
+      map(res => {
+        if (res.success) {
+          return res.data;
+        } else {
+          throw new Error(res.message);
+        }
+      })
+    );
+  }
+
   getRecordDetail<T>(url: string) {
     return this.http.get<UniversalResponse<T>>(url).pipe(
       map(res => {
@@ -148,6 +162,22 @@ export class BaseCrudComponentService<T, S extends ServiceWithBaseCrud> {
   deleteRecord(service: S, id: number, callback: Callback, transformDict?: TransformDict) {
     if (service.deleteRecord) {
       service.deleteRecord(id).subscribe({
+        next: res => {
+          if (transformDict) {
+            this.transformResponseData(res, transformDict);
+          }
+          callback(true, res);
+        },
+        error: () => {
+          callback(false);
+        }
+      });
+    }
+  }
+
+  batchDeleteRecord(service: S, ids: number[], callback: Callback, transformDict?: TransformDict) {
+    if (service.batchDeleteRecord) {
+      service.batchDeleteRecord(ids).subscribe({
         next: res => {
           if (transformDict) {
             this.transformResponseData(res, transformDict);
