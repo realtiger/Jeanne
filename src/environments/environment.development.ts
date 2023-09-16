@@ -5,7 +5,7 @@ export const environment: Environment = {
   version: '0.0.1',
   useHash: true,
   api: {
-    baseUrl: '/api',
+    baseUrl: 'http://10.209.0.23:5000',
     refreshTokenEnabled: true,
     refreshTokenType: 're-request'
   },
@@ -26,64 +26,32 @@ export const environment: Environment = {
       menuIcon: 'icon-dashboard',
       link: '/dashboard',
       children: [
-        {
-          title: '分析页',
-          link: '/dashboard/analysis'
-        },
-        {
-          title: '监控页',
-          link: '/dashboard/monitor'
-        },
-        {
-          title: '工作台',
-          link: '/dashboard/workplace'
-        }
+        { title: '分析页', link: '/dashboard/analysis' },
+        { title: '监控页', link: '/dashboard/monitor' },
+        { title: '工作台', link: '/dashboard/workplace' }
       ]
     },
     {
       title: '资产管理',
       menuIcon: 'icon-build-with-tool',
       children: [
-        {
-          title: '主机管理',
-          link: '/assets-manager/server-manager',
-          needPermission: ['cmdb:get-all-server']
-        }
+        { title: '主机管理', link: '/assets-manager/server-manager', needPermission: ['cmdb:get-all-server'] },
+        { title: '标签管理', link: '/assets-manager/tag-manager', needPermission: ['cmdb:get-all-tag'] }
       ]
     },
     {
       title: '权限管理',
       menuIcon: 'icon-set-permission',
       children: [
-        {
-          title: '角色管理',
-          link: '/system/role',
-          needPermission: ['system:get-all-role'],
-          menuIcon: 'icon-set-role'
-        },
-        {
-          title: '用户管理',
-          link: '/system/user',
-          needPermission: ['system:get-all-user'],
-          menuIcon: 'icon-op-member'
-        },
-        {
-          title: '权限管理',
-          link: '/system/permission',
-          needPermission: ['system:get-all-permission']
-        }
+        { title: '角色管理', link: '/system/role', needPermission: ['system:get-all-role'], menuIcon: 'icon-set-role' },
+        { title: '用户管理', link: '/system/user', needPermission: ['system:get-all-user'], menuIcon: 'icon-op-member' },
+        { title: '权限管理', link: '/system/permission', needPermission: ['system:get-all-permission'] }
       ]
     },
     {
       title: '系统管理',
       menuIcon: 'icon-setting',
-      children: [
-        {
-          title: '系统日志',
-          link: '/system-manager/system-log',
-          needPermission: ['system:get-one-operation_record']
-        }
-      ]
+      children: [{ title: '系统日志', link: '/system-manager/system-log', needPermission: ['system:get-one-operation_record'] }]
     }
   ]
 };

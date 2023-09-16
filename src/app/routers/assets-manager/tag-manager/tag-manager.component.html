@@ -1,0 +1,17 @@
+<app-page-content
+  [name]="'标签'"
+  [tableColumns]="columns"
+  [showTitleDict]="showTitleDict"
+  [createFormConfig]="createFormConfig"
+  [createDefaultData]="createDefaultData"
+  [updateFormConfig]="updateFormConfig"
+  [detailConfig]="detailConfig"
+  [multiChecked]="true"
+  [operationsEnabled]="operationsEnabled"
+  (loadFunc)="loadData($event)"
+  (createFunc)="createTag($event)"
+  (updateFunc)="updateTag($event)"
+  (deleteFunc)="deleteTag($event)"
+  (batchDeleteFunc)="batchDeleteTag($event)"
+  (detailFunc)="getTagDetail($event)"
+></app-page-content>

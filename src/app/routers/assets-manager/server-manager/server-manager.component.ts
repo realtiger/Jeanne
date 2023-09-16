@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild } from '@angular/core';
-import { DrawerService, IDrawerOpenResult } from 'ng-devui';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild } from '@angular/core';
+import { DialogService, DrawerService, IDrawerOpenResult, ModalComponent } from 'ng-devui';
 import { ITabOperation } from 'ng-devui/tabs/tabs.component';
 
 import { ServerManagerService } from './server-manager.service';
@@ -15,14 +15,20 @@ import {
   TerminalTabItem,
   UpdateServerBody
 } from '../../../../types/assets-manager/server-manager';
+import { Tag } from '../../../../types/assets-manager/tag-manager';
 import { LoadDataParams } from '../../../../types/global';
-import { CreateDataParams, DeleteDataParams, DetailDataParams, UpdateDataParams } from '../../../../types/layout';
+import { CreateDataParams, DeleteDataParams, DetailDataParams, OperationsEnabled, UpdateDataParams } from '../../../../types/layout';
 import { WebsocketHandler } from '../../../core/net/websocket-handler';
 import { AuthService } from '../../../core/services/auth.service';
 import { TokenService } from '../../../core/services/token.service';
 import { BaseCrudComponentService } from '../../../shared/base-crud.service';
 import { CommonToolsService } from '../../../shared/common-tools.service';
 import { getUpdateParams } from '../../../shared/utils';
+import { TagManagerService } from '../tag-manager/tag-manager.service';
+
+interface Server2ServerTag extends Tag {
+  $checked?: boolean;
+}
 
 @Component({
   selector: 'app-server-manager',
@@ -44,20 +50,33 @@ import { getUpdateParams } from '../../../shared/utils';
 })
 export class ServerManagerComponent {
   @ViewChild('terminalContentTemplate', { static: true }) terminalContentTemplate?: TemplateRef<any>;
+  @ViewChild('setServerTagsTemplate', { static: true }) setServerTagsTemplate: TemplateRef<any> | undefined;
 
-  transformDict: Array<string | { source: string; dest: string }> = [];
+  transformDict: Array<string | { source: string; dest: string }> = [{ source: 'serverTags', dest: 'server_tags' }];
   showTitleDict = ShowTitleDict;
   columns = ServerColumns;
   createDefaultData = ServerCreateDefaultData;
   createFormConfig = ServerCreateFormConfig;
   updateFormConfig = ServerUpdateFormConfig;
   detailConfig = ServerDetailConfig;
-  optionsEnabled = {
-    create: this.authService.hasPermission('POST', 'system:create-one-role'),
-    update: this.authService.hasPermission('PUT', 'system:update-one-role'),
-    delete: this.authService.hasPermission('DELETE', 'system:delete-one-role'),
-    detail: this.authService.hasPermission('GET', 'system:get-one-role')
+  operationsEnabled: OperationsEnabled = {
+    create: { enabled: this.authService.hasPermission('POST', 'cmdb:create-one-server') },
+    update: { enabled: this.authService.hasPermission('PUT', 'cmdb:update-one-server') },
+    delete: { enabled: this.authService.hasPermission('DELETE', 'cmdb:delete-one-server') },
+    detail: { enabled: this.authService.hasPermission('GET', 'cmdb:get-one-server') }
   };
+
+  server2ServerTags: Server2ServerTag[] = [];
+  serverTagsLoading = false;
+  serverTags: Server2ServerTag[] = [];
+  serverTagsPage = {
+    index: 1,
+    limit: 10,
+    total: 0
+  };
+  server2ServerTagsAllChecked = false;
+  selectServer: Server | null = null;
+  modelRef: { modalInstance: ModalComponent } | null = null;
 
   terminalTabs: TerminalTabItem[] = [];
   terminalTabActiveId: string | number = 0;
@@ -66,11 +85,14 @@ export class ServerManagerComponent {
   terminalFullScreen = false;
 
   constructor(
+    private cdr: ChangeDetectorRef,
+    private dialogService: DialogService,
     private drawerService: DrawerService,
     private commonToolsService: CommonToolsService,
     private authService: AuthService,
     private tokenService: TokenService,
     private serverManagerService: ServerManagerService,
+    private tagManagerService: TagManagerService,
     private baseCrudComponentService: BaseCrudComponentService<Server, ServerManagerService>
   ) {
     // 将 updateFormConfig.items 和 createFormConfig.items 进行合并，以 prop 字段作为唯一标识
@@ -218,4 +240,162 @@ export class ServerManagerComponent {
       this.terminalTabActiveId = this.terminalTabs.length > 0 ? this.terminalTabs[0].id : 0;
     }
   }
+
+  // ###### begin 服务器标签管理 #######
+  openSetServerTagsForm(row: Server) {
+    // 初始化操作
+    this.serverTagsPage = {
+      index: 1,
+      limit: 10,
+      total: 0
+    };
+    this.server2ServerTags = [];
+    this.serverTags = [];
+
+    this.selectServer = row;
+    console.log(row);
+    this.serverTagsLoading = true;
+    if (this.selectServer.serverTags.length > 0) {
+      this.tagManagerService.getRecordList({ index: this.serverTagsPage.index, limit: this.serverTagsPage.limit, ids: this.selectServer.serverTags }).subscribe({
+        next: value => {
+          this.server2ServerTags = value.items;
+          this.loadServerTags();
+        }
+      });
+    } else {
+      this.loadServerTags();
+    }
+
+    if (this.setServerTagsTemplate) {
+      this.modelRef = this.dialogService.open({
+        id: 'set-role-dialog',
+        width: '600px',
+        maxHeight: '600px',
+        title: '设置服务器标签',
+        contentTemplate: this.setServerTagsTemplate,
+        backdropCloseable: true,
+        onClose: () => {
+          this.selectServer = null;
+        },
+        buttons: []
+      });
+    }
+  }
+
+  closeSetServerTagsForm() {
+    this.modelRef?.modalInstance.hide();
+  }
+
+  loadServerTags(index = 1, limit = 10) {
+    this.serverTagsLoading = true;
+    this.tagManagerService.getRecordList({ index, limit }).subscribe({
+      next: value => {
+        this.serverTagsLoading = false;
+        this.serverTags = [];
+        for (const tag of value.items) {
+          if (this.server2ServerTags.findIndex(item => item.id === tag.id) === -1) {
+            this.serverTags.push({ ...tag, $checked: false });
+          } else {
+            this.serverTags.push({ ...tag, $checked: true });
+          }
+        }
+        this.server2ServerTagsAllChecked = true;
+        for (const serverTag of this.serverTags) {
+          if (!serverTag.$checked) {
+            this.server2ServerTagsAllChecked = false;
+            break;
+          }
+        }
+        this.serverTagsPage = value.pagination;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  checkStatusChange(item: Server2ServerTag) {
+    if (item.$checked) {
+      this.server2ServerTags = [...this.server2ServerTags, item].sort((a, b) => a.id - b.id);
+      this.server2ServerTagsAllChecked = true;
+      for (const serverTag of this.serverTags) {
+        if (!serverTag.$checked) {
+          this.server2ServerTagsAllChecked = false;
+          break;
+        }
+      }
+    } else {
+      this.server2ServerTagsAllChecked = false;
+      const index = this.server2ServerTags.findIndex(serverTag => serverTag.id === item.id);
+      if (index !== -1) {
+        this.server2ServerTags.splice(index, 1);
+      }
+    }
+  }
+
+  checkAllServerTags() {
+    for (const serverTag of this.serverTags) {
+      serverTag.$checked = this.server2ServerTagsAllChecked;
+    }
+
+    if (this.server2ServerTagsAllChecked) {
+      for (const serverTag of this.serverTags) {
+        if (this.server2ServerTags.findIndex(item => item.id === serverTag.id) === -1) {
+          this.server2ServerTags = [...this.server2ServerTags, serverTag];
+        }
+        this.server2ServerTags = this.server2ServerTags.sort((a, b) => a.id - b.id);
+      }
+    } else {
+      for (const serverTag of this.serverTags) {
+        const index = this.server2ServerTags.findIndex(item => item.id === serverTag.id);
+        if (index !== -1) {
+          this.server2ServerTags.splice(index, 1);
+        }
+      }
+    }
+  }
+
+  server2ServerTagsPageSizeChange(pageSize: number) {
+    this.loadServerTags(this.serverTagsPage.index, pageSize);
+  }
+
+  server2ServerTagsPageIndexChange(pageIndex: number) {
+    this.loadServerTags(pageIndex, this.serverTagsPage.limit);
+  }
+
+  updateServer2ServerTags() {
+    this.serverTagsLoading = true;
+    const serverId = this.selectServer?.id || 0;
+    const serverTagIds = this.server2ServerTags.map(item => item.id);
+
+    if (serverId === 0) {
+      this.serverTagsLoading = false;
+      return;
+    }
+    if (this.selectServer?.serverTags.length === serverTagIds.length) {
+      let isSame = true;
+      for (const serverTagId of serverTagIds) {
+        if (this.selectServer.serverTags.findIndex(item => item === serverTagId) === -1) {
+          isSame = false;
+          break;
+        }
+      }
+      if (isSame) {
+        this.serverTagsLoading = false;
+        return;
+      }
+    }
+
+    this.serverManagerService.updateServerToServerTag(serverId, serverTagIds).subscribe({
+      next: value => {
+        this.serverTagsLoading = false;
+        if (this.selectServer) {
+          this.selectServer.serverTags = value.serverTags;
+        }
+      },
+      error: () => {
+        this.serverTagsLoading = false;
+      }
+    });
+  }
+
+  // ###### end 服务器标签管理 #######
 }

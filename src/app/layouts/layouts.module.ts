@@ -8,6 +8,7 @@ import {
   BadgeModule,
   BreadcrumbModule,
   ButtonModule,
+  CheckBoxModule,
   DataTableModule,
   DatepickerModule,
   DropDownModule,
@@ -80,7 +81,8 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
     LoadingModule,
     PaginationModule,
     DataTableModule,
-    ToggleModule
+    ToggleModule,
+    CheckBoxModule
   ],
   providers: [LayoutsService],
   exports: [FooterComponent, OverallLayoutComponent, PageHeaderComponent, PageFormComponent, PageContentComponent]

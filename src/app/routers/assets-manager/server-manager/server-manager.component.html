@@ -7,7 +7,7 @@
   [updateFormConfig]="updateFormConfig"
   [detailConfig]="detailConfig"
   [createType]="'modal'"
-  [optionsEnabled]="optionsEnabled"
+  [operationsEnabled]="operationsEnabled"
   [operationTpl]="optionTemplate"
   (loadFunc)="loadData($event)"
   (createFunc)="createServer($event)"
@@ -19,6 +19,7 @@
 <ng-template #optionTemplate let-item>
   <!--  先把 terminal 按钮隐藏 -->
   <!--  <d-button icon="icon-console" bsStyle="text" title="打开终端" (click)="openTerminal(item)"></d-button>-->
+  <d-button icon="icon-milestone" bsStyle="text-dark" title="设置标签" (click)="openSetServerTagsForm(item)"></d-button>
 </ng-template>
 
 <ng-template #terminalContentTemplate>
@@ -44,4 +45,54 @@
     </div>
     <input type="text" class="terminal-input" [(ngModel)]="terminalInput" (keyup.enter)="sendTerminalInput()" />
   </div>
+</ng-template>
+
+<ng-template #setServerTagsTemplate>
+  <div class="select-tags">
+    <span>标签：</span>
+    <span *ngFor="let serverTag of server2ServerTags; let last = last"> {{ serverTag.name }}{{ last ? '' : ',' }} </span>
+  </div>
+  <div>
+    <span>可选择标签：</span>
+    <d-data-table [dataSource]="serverTags" [scrollable]="true">
+      <thead dTableHead>
+        <tr dTableRow>
+          <th dHeadCell>
+            <d-checkbox [(ngModel)]="server2ServerTagsAllChecked" (ngModelChange)="checkAllServerTags()"></d-checkbox>
+          </th>
+          <th dHeadCell>标签名称</th>
+        </tr>
+      </thead>
+      <tbody dTableBody>
+        <ng-template let-rowItem="rowItem">
+          <tr dTableRow>
+            <td dTableCell class="devui-checkable-cell">
+              <d-checkbox [(ngModel)]="rowItem.$checked" (ngModelChange)="checkStatusChange(rowItem)"></d-checkbox>
+            </td>
+            <td dTableCell>{{ rowItem.name }}</td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </d-data-table>
+  </div>
+  <d-pagination
+    [total]="serverTagsPage.total"
+    [(pageSize)]="serverTagsPage.limit"
+    [(pageIndex)]="serverTagsPage.index"
+    [canViewTotal]="true"
+    [canChangePageSize]="true"
+    [canJumpPage]="true"
+    (pageIndexChange)="server2ServerTagsPageIndexChange($event)"
+    (pageSizeChange)="server2ServerTagsPageSizeChange($event)"
+  ></d-pagination>
+  <d-row [dGutter]="12">
+    <d-col [dSpan]="12">
+      <d-button bsStyle="primary" [disabled]="serverTagsLoading" (click)="updateServer2ServerTags()" [showLoading]="serverTagsLoading" width="100%" [style]="{ width: '100%' }">
+        {{ serverTagsLoading ? '列表加载中...' : '设置' }}
+      </d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button bsStyle="common" (click)="closeSetServerTagsForm()" width="100%" [style]="{ width: '100%' }">取消</d-button>
+    </d-col>
+  </d-row>
 </ng-template>

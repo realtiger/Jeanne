@@ -14,6 +14,8 @@ interface Server extends QueryAdditionalFields {
   adminUser: string;
   region: string;
   detail: string;
+  serverTags: number[];
+  server_tags: number[];
 }
 
 interface CreateServerBody {

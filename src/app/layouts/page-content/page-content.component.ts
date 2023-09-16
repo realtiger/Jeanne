@@ -2,14 +2,46 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 import { DialogService, ModalComponent, TableWidthConfig } from 'ng-devui';
 
 import { ListItems, ListParams, LoadDataParams } from '../../../types/global';
-import { CreateDataParams, DeleteDataParams, DetailConfig, DetailDataParams, FormConfig, FormData, TableColumns, UpdateDataParams } from '../../../types/layout';
+import {
+  BatchDeleteDataParams,
+  CreateDataParams,
+  DeleteDataParams,
+  DetailConfig,
+  DetailDataParams,
+  FormConfig,
+  FormData,
+  OperationsEnabled,
+  TableColumns,
+  UpdateDataParams
+} from '../../../types/layout';
 
-interface OptionsEnabled {
-  create?: boolean;
-  update?: boolean;
-  delete?: boolean;
-  detail?: boolean;
-}
+const DEFAULT_OPERATIONS_ENABLED: Required<OperationsEnabled> = {
+  create: {
+    enabled: false,
+    tileMode: true,
+    dropdownMode: false
+  },
+  update: {
+    enabled: false,
+    tileMode: true,
+    dropdownMode: false
+  },
+  delete: {
+    enabled: false,
+    tileMode: true,
+    dropdownMode: false
+  },
+  batchDelete: {
+    enabled: false,
+    tileMode: true,
+    dropdownMode: false
+  },
+  detail: {
+    enabled: false,
+    tileMode: true,
+    dropdownMode: false
+  }
+};
 
 @Component({
   selector: 'app-page-content',
@@ -52,28 +84,29 @@ export class PageContentComponent implements OnInit {
   @ViewChild('detailTemplate', { static: true }) detailTemplate: TemplateRef<any> | undefined;
 
   @Input() operationTpl: TemplateRef<{ $implicit: any }> | null = null;
+  @Input() operationMoreTpl: TemplateRef<{ $implicit: any }> | null = null;
+  @Input() operationHeaderLeftTpl: TemplateRef<any> | null = null;
+  @Input() operationHeaderRightTpl: TemplateRef<any> | null = null;
   // table 样式配置
   @Input() name = '';
   @Input() tableWidthConfig: TableWidthConfig[] = [];
   @Input() tableColumns: TableColumns[] = [];
   @Input() records: any[] = [];
   @Input() showTitleDict: { [key: string]: { [key: string]: string } } = {};
-  @Input() optionsEnabled: OptionsEnabled = {
-    create: false,
-    update: false,
-    delete: false,
-    detail: false
-  };
+  @Input() operationsEnabled: OperationsEnabled = {};
   @Input() createDefaultData: any = {};
   @Input() createFormConfig: FormConfig = { items: [] };
   @Input() updateFormConfig: FormConfig = { items: [] };
   @Input() detailConfig: DetailConfig[] = [];
   @Input() createType: 'inline' | 'modal' = 'inline';
+  @Input() operationsMoreVisible = false;
+  @Input() multiChecked = false;
 
   @Output() loadFunc = new EventEmitter<LoadDataParams>();
   @Output() createFunc = new EventEmitter<CreateDataParams>();
   @Output() updateFunc = new EventEmitter<UpdateDataParams>();
   @Output() deleteFunc = new EventEmitter<DeleteDataParams>();
+  @Output() batchDeleteFunc = new EventEmitter<BatchDeleteDataParams>();
   @Output() detailFunc = new EventEmitter<DetailDataParams>();
 
   loading = false;
@@ -84,6 +117,8 @@ export class PageContentComponent implements OnInit {
     offset: 0,
     total: 0
   };
+  recordAllChecked = false;
+  recordHalfChecked = false;
 
   selectRecord: any;
   modelRef: { modalInstance: ModalComponent } | null = null;
@@ -95,28 +130,66 @@ export class PageContentComponent implements OnInit {
     return this.name.length > 0 ? this.name : '记录';
   }
 
+  get checkedRecordList() {
+    return this.records.filter(i => i.$checked);
+  }
+
   constructor(private cdr: ChangeDetectorRef, private dialogService: DialogService) {}
 
   ngOnInit() {
     this.loadData(this.page.index, this.page.limit);
-    this.optionsEnabled = {
-      create: false,
-      update: false,
-      delete: false,
-      detail: false,
-      ...this.optionsEnabled
-    };
+    this.mergeOperationsEnabled();
+  }
+
+  mergeOperationsEnabled() {
+    const enabledConf = DEFAULT_OPERATIONS_ENABLED;
+    // merge create
+    if (this.operationsEnabled.create) {
+      enabledConf.create.enabled = this.operationsEnabled.create.enabled || DEFAULT_OPERATIONS_ENABLED.create.enabled;
+      enabledConf.create.tileMode = this.operationsEnabled.create.tileMode || DEFAULT_OPERATIONS_ENABLED.create.tileMode;
+      enabledConf.create.dropdownMode = this.operationsEnabled.create.dropdownMode || DEFAULT_OPERATIONS_ENABLED.create.dropdownMode;
+    }
+
+    // merge update
+    if (this.operationsEnabled.update) {
+      enabledConf.update.enabled = this.operationsEnabled.update.enabled || DEFAULT_OPERATIONS_ENABLED.update.enabled;
+      enabledConf.update.tileMode = this.operationsEnabled.update.tileMode || DEFAULT_OPERATIONS_ENABLED.update.tileMode;
+      enabledConf.update.dropdownMode = this.operationsEnabled.update.dropdownMode || DEFAULT_OPERATIONS_ENABLED.update.dropdownMode;
+    }
+
+    // merge delete
+    if (this.operationsEnabled.delete) {
+      enabledConf.delete.enabled = this.operationsEnabled.delete.enabled || DEFAULT_OPERATIONS_ENABLED.delete.enabled;
+      enabledConf.delete.tileMode = this.operationsEnabled.delete.tileMode || DEFAULT_OPERATIONS_ENABLED.delete.tileMode;
+      enabledConf.delete.dropdownMode = this.operationsEnabled.delete.dropdownMode || DEFAULT_OPERATIONS_ENABLED.delete.dropdownMode;
+    }
+
+    // merge batchDelete
+    if (this.operationsEnabled.batchDelete) {
+      enabledConf.batchDelete.enabled = this.operationsEnabled.batchDelete.enabled || DEFAULT_OPERATIONS_ENABLED.batchDelete.enabled;
+      enabledConf.batchDelete.tileMode = this.operationsEnabled.batchDelete.tileMode || DEFAULT_OPERATIONS_ENABLED.batchDelete.tileMode;
+      enabledConf.batchDelete.dropdownMode = this.operationsEnabled.batchDelete.dropdownMode || DEFAULT_OPERATIONS_ENABLED.batchDelete.dropdownMode;
+    }
+
+    // merge detail
+    if (this.operationsEnabled.detail) {
+      enabledConf.detail.enabled = this.operationsEnabled.detail.enabled || DEFAULT_OPERATIONS_ENABLED.detail.enabled;
+      enabledConf.detail.tileMode = this.operationsEnabled.detail.tileMode || DEFAULT_OPERATIONS_ENABLED.detail.tileMode;
+      enabledConf.detail.dropdownMode = this.operationsEnabled.detail.dropdownMode || DEFAULT_OPERATIONS_ENABLED.detail.dropdownMode;
+    }
+
+    this.operationsEnabled = enabledConf;
   }
 
   objectHasKey(obj: Object) {
     return Object.keys(obj).length !== 0;
   }
 
-  hasOptionsEnabled() {
+  hasOperationsEnabled() {
     return (
-      (this.optionsEnabled.delete && this.deleteFunc.observed) ||
-      (this.optionsEnabled.update && this.updateFunc.observed) ||
-      (this.optionsEnabled.detail && this.detailFunc.observed)
+      (this.operationsEnabled.delete && this.deleteFunc.observed) ||
+      (this.operationsEnabled.update && this.updateFunc.observed) ||
+      (this.operationsEnabled.detail && this.detailFunc.observed)
     );
   }
 
@@ -157,6 +230,8 @@ export class PageContentComponent implements OnInit {
       this.records = res.items;
       this.page = res.pagination;
       this.loading = false;
+      this.recordAllChecked = false;
+      this.recordHalfChecked = false;
       this.cdr.detectChanges();
     } else {
       this.loading = false;
@@ -181,6 +256,30 @@ export class PageContentComponent implements OnInit {
     this.page.limit = pageSize;
     this.loadData(this.page.index, pageSize);
   }
+
+  // ########### check handler begin ###########
+  checkStatusChange() {
+    const recordCheckedStatusCount = this.records.filter(i => i.$checked).length;
+    if (recordCheckedStatusCount === 0) {
+      this.recordAllChecked = false;
+      this.recordHalfChecked = false;
+    } else if (recordCheckedStatusCount === this.records.length) {
+      this.recordAllChecked = true;
+      this.recordHalfChecked = false;
+    } else {
+      this.recordAllChecked = false;
+      this.recordHalfChecked = true;
+    }
+  }
+
+  checkAllRecordsStatusChange() {
+    this.recordHalfChecked = false;
+    for (const record of this.records) {
+      record.$checked = this.recordAllChecked;
+    }
+  }
+
+  // ########### check handler end ###########
 
   // ########### create form begin ###########
   openCreateForm() {
@@ -299,21 +398,29 @@ export class PageContentComponent implements OnInit {
 
   // ########### delete form begin ###########
   openDeleteForm(record: any) {
-    this.selectRecord = record;
+    let title = `删除${this.showName}`;
+    let content, deleteFunc;
+    if (record === null) {
+      title = `批量删除${this.showName}`;
+      content = `确定要删除这 ${this.checkedRecordList.length} 条${this.showName} 吗？`;
+      deleteFunc = () => this.batchDeleteRecord();
+    } else {
+      this.selectRecord = record;
+      content = `确定要删除${this.showName} ${this.recordName(record)} 吗？`;
+      deleteFunc = () => this.deleteRecord(record.id);
+    }
     this.modelRef = this.dialogService.open({
       id: 'delete-dialog',
       width: '346px',
       maxHeight: '800px',
-      title: `删除${this.showName}`,
+      title,
       showAnimate: false,
-      content: `确定要删除${this.showName} ${this.recordName(record)} 吗？`,
+      content,
       buttons: [
         {
           cssClass: 'danger',
           text: '删除',
-          handler: () => {
-            this.deleteRecord(record.id);
-          }
+          handler: deleteFunc
         },
         {
           id: 'btn-cancel',
@@ -347,6 +454,14 @@ export class PageContentComponent implements OnInit {
     this.loading = true;
     this.cdr.detectChanges();
     this.deleteFunc.emit({ id, callback: this.deleteRecordCallback.bind(this) });
+  }
+
+  batchDeleteRecord() {
+    this.closeDeleteForm();
+    this.loading = true;
+    this.cdr.detectChanges();
+    const ids = this.checkedRecordList.map(i => i.id);
+    this.batchDeleteFunc.emit({ ids: ids, callback: this.deleteRecordCallback.bind(this) });
   }
 
   // ########### delete form end ###########

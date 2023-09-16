@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { RoleManagerService } from './role-manager.service';
 import { LoadDataParams } from '../../../../types/global';
-import { CreateDataParams, DeleteDataParams, DetailDataParams, UpdateDataParams } from '../../../../types/layout';
+import { CreateDataParams, DeleteDataParams, DetailDataParams, OperationsEnabled, UpdateDataParams } from '../../../../types/layout';
 import {
   CreateRole,
   Role,
@@ -31,11 +31,11 @@ export class RoleManagerComponent {
   createFormConfig = RoleCreateFormConfig;
   updateFormConfig = RoleUpdateFormConfig;
   detailConfig = RoleDetailConfig;
-  optionsEnabled = {
-    create: this.authService.hasPermission('POST', 'system:create-one-role'),
-    update: this.authService.hasPermission('PUT', 'system:update-one-role'),
-    delete: this.authService.hasPermission('DELETE', 'system:delete-one-role'),
-    detail: this.authService.hasPermission('GET', 'system:get-one-role')
+  operationsEnabled: OperationsEnabled = {
+    create: { enabled: this.authService.hasPermission('POST', 'system:create-one-role') },
+    update: { enabled: this.authService.hasPermission('PUT', 'system:update-one-role') },
+    delete: { enabled: this.authService.hasPermission('DELETE', 'system:delete-one-role') },
+    detail: { enabled: this.authService.hasPermission('GET', 'system:get-one-role') }
   };
 
   constructor(

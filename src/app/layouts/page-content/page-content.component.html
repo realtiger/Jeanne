@@ -5,16 +5,28 @@
     <div class="list-container" dLoading [loading]="loading" [backdrop]="true">
       <div class="list-header">
         <div class="list-header-operation">
-          <div class="left"></div>
+          <div class="left">
+            <d-button
+              *ngIf="batchDeleteFunc.observed && operationsEnabled.batchDelete?.enabled && multiChecked"
+              icon="icon-delete"
+              title="批量删除"
+              [disabled]="!checkedRecordList.length"
+              (click)="openDeleteForm(null)"
+            >
+              批量删除
+            </d-button>
+            <ng-template [ngTemplateOutlet]="operationHeaderLeftTpl" [ngTemplateOutletContext]="{ $implicit: checkedRecordList }"></ng-template>
+          </div>
           <div class="right">
             <d-button
               icon="icon-add"
               title="新建"
               (click)="openCreateCard()"
-              *ngIf="createType === 'modal' && createFunc.observed && objectHasKey(createDefaultData) && optionsEnabled.create"
+              *ngIf="createType === 'modal' && createFunc.observed && objectHasKey(createDefaultData) && operationsEnabled.create?.enabled && operationsEnabled.create?.tileMode"
             >
               新建{{ showName }}
             </d-button>
+            <ng-template [ngTemplateOutlet]="operationHeaderRightTpl" [ngTemplateOutletContext]="{ $implicit: checkedRecordList }"></ng-template>
           </div>
         </div>
       </div>
@@ -22,9 +34,12 @@
         <d-data-table [dataSource]="records" [scrollable]="true" [tableWidthConfig]="tableWidthConfig">
           <thead dTableHead>
             <tr dTableRow>
+              <th dHeadCell *ngIf="multiChecked">
+                <d-checkbox [(ngModel)]="recordAllChecked" (ngModelChange)="checkAllRecordsStatusChange()" [halfchecked]="recordHalfChecked"></d-checkbox>
+              </th>
               <th dHeadCell>#</th>
               <th dHeadCell *ngFor="let column of tableColumns"> {{ column.header }} </th>
-              <th dHeadCell *ngIf="hasOptionsEnabled()">操作</th>
+              <th dHeadCell *ngIf="hasOperationsEnabled()">操作</th>
             </tr>
           </thead>
           <tbody dTableBody>
@@ -33,8 +48,8 @@
               <tr dTableRow *ngIf="createType === 'inline' && rowIndex === 0">
                 <td
                   dTableCell
-                  [attr.colspan]="hasOptionsEnabled() ? tableColumns.length + 2 : tableColumns.length + 1"
-                  *ngIf="createFunc.observed && objectHasKey(createDefaultData) && optionsEnabled.create"
+                  [attr.colspan]="hasOperationsEnabled() ? tableColumns.length + 2 : tableColumns.length + 1"
+                  *ngIf="createFunc.observed && objectHasKey(createDefaultData) && operationsEnabled.create?.enabled && operationsEnabled.create?.tileMode"
                 >
                   <div *ngIf="!showCreateForm" (click)="openCreateForm()" class="cursor-pointer" tabindex="0" (keyup.enter)="openCreateForm()">
                     <span class="tips-icon icon-add"></span>
@@ -55,6 +70,9 @@
               </tr>
               <!-- 具体内容展示表格的行 -->
               <tr dTableRow>
+                <td dTableCell *ngIf="multiChecked">
+                  <d-checkbox [(ngModel)]="rowItem.$checked" (ngModelChange)="checkStatusChange()"></d-checkbox>
+                </td>
                 <!-- 当前表格序号的列 -->
                 <td dTableCell>{{ rowIndex + 1 }}</td>
                 <!-- 显示定义tableColumns中对应字段的内容的列 -->
@@ -68,23 +86,68 @@
                   <span *ngIf="column.fieldType === 'date'">{{ rowItem[column.field] | date : 'yyyy-MM-dd' }}</span>
                 </td>
                 <!-- 操作按钮的列 -->
-                <td *ngIf="hasOptionsEnabled()">
+                <td *ngIf="hasOperationsEnabled()">
                   <d-button
                     icon="icon-property"
                     bsStyle="text"
                     title="详情"
                     (click)="openDetailCard(rowItem)"
-                    *ngIf="objectHasKey(detailConfig) && optionsEnabled.detail"
+                    *ngIf="objectHasKey(detailConfig) && operationsEnabled.detail?.enabled && operationsEnabled.detail?.tileMode"
                   ></d-button>
                   <d-button
                     icon="icon-edit"
                     bsStyle="text"
                     title="编辑"
                     (click)="openUpdateForm(rowItem)"
-                    *ngIf="updateFunc.observed && objectHasKey(updateFormConfig) && optionsEnabled.update"
+                    *ngIf="updateFunc.observed && objectHasKey(updateFormConfig) && operationsEnabled.update?.enabled && operationsEnabled.update?.tileMode"
                   ></d-button>
-                  <d-button icon="icon-delete" bsStyle="text" title="删除" (click)="openDeleteForm(rowItem)" *ngIf="deleteFunc.observed && optionsEnabled.delete"></d-button>
+                  <d-button
+                    icon="icon-delete"
+                    bsStyle="text"
+                    title="删除"
+                    (click)="openDeleteForm(rowItem)"
+                    *ngIf="deleteFunc.observed && operationsEnabled.delete?.enabled && operationsEnabled.delete?.tileMode"
+                  ></d-button>
                   <ng-template [ngTemplateOutlet]="operationTpl" [ngTemplateOutletContext]="{ $implicit: rowItem }"></ng-template>
+                  <div *ngIf="operationsMoreVisible" dDropDown appendToBody [style]="{ display: 'inline-block' }">
+                    <d-button icon="icon-more-operate" bsStyle="text" title="更多操作" dDropDownToggle></d-button>
+                    <ul dDropDownMenu role="menu">
+                      <li role="menuitem">
+                        <a
+                          *ngIf="objectHasKey(detailConfig) && operationsEnabled.detail?.enabled && operationsEnabled.detail?.dropdownMode"
+                          tabindex="0"
+                          (keyup.enter)="openDetailCard(rowItem)"
+                          (click)="openDetailCard(rowItem)"
+                          dDropDownMenuItem
+                        >
+                          <span class="icon-property"></span> 详情
+                        </a>
+                      </li>
+                      <li role="menuitem">
+                        <a
+                          *ngIf="updateFunc.observed && objectHasKey(updateFormConfig) && operationsEnabled.update?.enabled && operationsEnabled.update?.dropdownMode"
+                          tabindex="0"
+                          (keyup.enter)="openUpdateForm(rowItem)"
+                          (click)="openUpdateForm(rowItem)"
+                          dDropDownMenuItem
+                        >
+                          <span class="icon-edit"></span> 编辑
+                        </a>
+                      </li>
+                      <li role="menuitem">
+                        <a
+                          *ngIf="deleteFunc.observed && operationsEnabled.delete?.enabled && operationsEnabled.delete?.dropdownMode"
+                          tabindex="0"
+                          (keyup.enter)="openDeleteForm(rowItem)"
+                          (click)="openDeleteForm(rowItem)"
+                          dDropDownMenuItem
+                        >
+                          <span class="icon-delete"></span> 删除
+                        </a>
+                      </li>
+                      <ng-template [ngTemplateOutlet]="operationMoreTpl" [ngTemplateOutletContext]="{ $implicit: rowItem }"></ng-template>
+                    </ul>
+                  </div>
                 </td>
               </tr>
             </ng-template>
