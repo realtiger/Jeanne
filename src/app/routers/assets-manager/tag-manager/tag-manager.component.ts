@@ -17,7 +17,7 @@ import { LoadDataParams } from '../../../../types/global';
 import { BatchDeleteDataParams, CreateDataParams, DeleteDataParams, DetailDataParams, OperationsEnabled, UpdateDataParams } from '../../../../types/layout';
 import { AuthService } from '../../../core/services/auth.service';
 import { TokenService } from '../../../core/services/token.service';
-import { BaseCrudComponentService } from '../../../shared/base-crud.service';
+import { BaseCrudComponentService, TransformDict } from '../../../shared/base-crud.service';
 import { CommonToolsService } from '../../../shared/common-tools.service';
 import { getUpdateParams } from '../../../shared/utils';
 
@@ -28,7 +28,7 @@ import { getUpdateParams } from '../../../shared/utils';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagManagerComponent {
-  transformDict: Array<string | { source: string; dest: string }> = [];
+  transformDict: TransformDict = [];
   showTitleDict = ShowTitleDict;
   columns = TagColumns;
   createDefaultData = TagCreateDefaultData;
@@ -36,11 +36,11 @@ export class TagManagerComponent {
   updateFormConfig = TagUpdateFormConfig;
   detailConfig = TagDetailConfig;
   operationsEnabled: OperationsEnabled = {
-    create: { enabled: this.authService.hasPermission('POST', 'cmdb:create-one-tag') },
-    update: { enabled: this.authService.hasPermission('PUT', 'cmdb:update-one-tag') },
-    delete: { enabled: this.authService.hasPermission('DELETE', 'cmdb:delete-one-tag') },
-    batchDelete: { enabled: this.authService.hasPermission('DELETE', 'cmdb:delete-many-tag') },
-    detail: { enabled: this.authService.hasPermission('GET', 'cmdb:get-one-tag') }
+    create: { enabled: this.authService.hasPermission('POST', 'cmdb:create-one-server-tag') },
+    update: { enabled: this.authService.hasPermission('PUT', 'cmdb:update-one-server-tag') },
+    delete: { enabled: this.authService.hasPermission('DELETE', 'cmdb:delete-one-server-tag') },
+    batchDelete: { enabled: this.authService.hasPermission('DELETE', 'cmdb:delete-many-server-tag') },
+    detail: { enabled: this.authService.hasPermission('GET', 'cmdb:get-one-server-tag') }
   };
 
   constructor(
@@ -55,12 +55,16 @@ export class TagManagerComponent {
   loadData = (params: LoadDataParams) => this.baseCrudComponentService.loadData(this.tagManagerService, params, this.transformDict);
 
   createTag(params: CreateDataParams) {
-    const body: CreateTagBody = getUpdateParams(params.formData, this.transformDict);
+    const fields = this.createFormConfig.items.map(item => item.prop);
+
+    const body: CreateTagBody = getUpdateParams(params.formData, fields);
     this.baseCrudComponentService.createRecord(this.tagManagerService, body, params.callback, this.transformDict);
   }
 
   updateTag(params: UpdateDataParams) {
-    const body: UpdateTagBody = getUpdateParams(params.formData, this.transformDict);
+    const fields = this.updateFormConfig.items.map(item => item.prop);
+
+    const body: UpdateTagBody = getUpdateParams(params.formData, fields);
     this.baseCrudComponentService.updateRecord(this.tagManagerService, params.id, body, params.callback, this.transformDict);
   }
 

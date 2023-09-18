@@ -19,7 +19,7 @@
 <ng-template #optionTemplate let-item>
   <!--  先把 terminal 按钮隐藏 -->
   <!--  <d-button icon="icon-console" bsStyle="text" title="打开终端" (click)="openTerminal(item)"></d-button>-->
-  <d-button icon="icon-milestone" bsStyle="text-dark" title="设置标签" (click)="openSetServerTagsForm(item)"></d-button>
+  <d-button *ngIf="operationsEnabled.setServerTags" icon="icon-milestone" bsStyle="text-dark" title="设置标签" (click)="openSetServerTagsForm(item)"></d-button>
 </ng-template>
 
 <ng-template #terminalContentTemplate>

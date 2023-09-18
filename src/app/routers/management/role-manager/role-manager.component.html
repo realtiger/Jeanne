@@ -12,4 +12,59 @@
   (updateFunc)="updateRole($event)"
   (deleteFunc)="deleteRole($event)"
   (detailFunc)="getRoleDetail($event)"
+  [operationTpl]="optionTemplate"
 ></app-page-content>
+
+<ng-template #optionTemplate let-item>
+  <d-button icon="icon-set-permission" bsStyle="text-dark" title="设置权限" (click)="openSetRoleForm(item)"></d-button>
+</ng-template>
+
+<ng-template #setPermissionTemplate>
+  <div class="select-role">
+    <span>权限：</span>
+    <span *ngFor="let permission of rolePermissions; let last = last"> {{ permission.title }}{{ last ? '' : ',' }} </span>
+  </div>
+  <div>
+    <span>可选择权限：</span>
+    <d-data-table [dataSource]="permissions" [scrollable]="true">
+      <thead dTableHead>
+        <tr dTableRow>
+          <th dHeadCell>
+            <d-checkbox [(ngModel)]="rolePermissionsAllChecked" (ngModelChange)="checkAllRolePermissions()"></d-checkbox>
+          </th>
+          <th dHeadCell>权限名称</th>
+        </tr>
+      </thead>
+      <tbody dTableBody>
+        <ng-template let-rowItem="rowItem">
+          <tr dTableRow>
+            <td dTableCell class="devui-checkable-cell">
+              <d-checkbox [(ngModel)]="rowItem.$checked" (ngModelChange)="checkStatusChange(rowItem)"></d-checkbox>
+            </td>
+            <td dTableCell>{{ rowItem.title }}</td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </d-data-table>
+  </div>
+  <d-pagination
+    [total]="permissionsPage.total"
+    [(pageSize)]="permissionsPage.limit"
+    [(pageIndex)]="permissionsPage.index"
+    [canViewTotal]="true"
+    [canChangePageSize]="true"
+    [canJumpPage]="true"
+    (pageIndexChange)="rolePermissionsPageIndexChange($event)"
+    (pageSizeChange)="rolePermissionsPageSizeChange($event)"
+  ></d-pagination>
+  <d-row [dGutter]="12">
+    <d-col [dSpan]="12">
+      <d-button bsStyle="primary" [disabled]="permissionsLoading" (click)="updateRolePermissions()" [showLoading]="permissionsLoading" width="100%" [style]="{ width: '100%' }">
+        {{ permissionsLoading ? '列表加载中...' : '设置' }}
+      </d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button bsStyle="common" (click)="closeSetRoleForm()" width="100%" [style]="{ width: '100%' }">取消</d-button>
+    </d-col>
+  </d-row>
+</ng-template>

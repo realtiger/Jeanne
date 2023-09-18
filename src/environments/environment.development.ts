@@ -26,33 +26,30 @@ export const environment: Environment = {
       title: '仪表盘',
       menuIcon: 'icon-dashboard',
       link: '/dashboard',
-      children: [
-        { title: '分析页', link: '/dashboard/analysis' },
-        { title: '监控页', link: '/dashboard/monitor' },
-        { title: '工作台', link: '/dashboard/workplace' }
-      ]
+      linkType: 'routerLink'
     },
     {
       title: '资产管理',
       menuIcon: 'icon-build-with-tool',
       children: [
-        { title: '主机管理', link: '/assets-manager/server-manager', needPermission: ['cmdb:get-all-server'] },
-        { title: '标签管理', link: '/assets-manager/tag-manager', needPermission: ['cmdb:get-all-tag'] }
+        { title: '标签管理', link: '/assets-manager/tag-manager', linkType: 'routerLink', needPermission: ['cmdb:get-all-server-tag'] },
+        { title: '带外信息管理', link: '/assets-manager/server-admin-manager', linkType: 'routerLink', needPermission: ['cmdb:get-all-server-admin-info'] },
+        { title: '主机管理', link: '/assets-manager/server-manager', linkType: 'routerLink', needPermission: ['cmdb:get-all-server'] }
       ]
     },
     {
       title: '权限管理',
       menuIcon: 'icon-set-permission',
       children: [
-        { title: '角色管理', link: '/system/role', needPermission: ['system:get-all-role'], menuIcon: 'icon-set-role' },
-        { title: '用户管理', link: '/system/user', needPermission: ['system:get-all-user'], menuIcon: 'icon-op-member' },
-        { title: '权限管理', link: '/system/permission', needPermission: ['system:get-all-permission'] }
+        { title: '角色管理', link: '/system/role', linkType: 'routerLink', needPermission: ['system:get-all-role'] },
+        { title: '用户管理', link: '/system/user', linkType: 'routerLink', needPermission: ['system:get-all-user'] },
+        { title: '权限管理', link: '/system/permission', linkType: 'routerLink', needPermission: ['system:get-all-permission'] }
       ]
     },
     {
       title: '系统管理',
       menuIcon: 'icon-setting',
-      children: [{ title: '系统日志', link: '/system-manager/system-log', needPermission: ['system:get-one-operation_record'] }]
+      children: [{ title: '系统日志', link: '/system-manager/system-log', linkType: 'routerLink', needPermission: ['system:get-one-operation-record'] }]
     }
   ]
 };

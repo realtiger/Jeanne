@@ -3,13 +3,19 @@ import { DialogService, DValidateRules, FormLayout, ModalComponent, TableWidthCo
 
 import { UserManagerService } from './user-manager.service';
 import { ListParams, ResponseStatus } from '../../../../types/global';
-import { FormConfig, FormData, TableColumns } from '../../../../types/layout';
+import { FormConfig, FormData, OperationsEnabled, TableColumns } from '../../../../types/layout';
 import { Role } from '../../../../types/management/role-manager';
 import { CreateUserData, UpdateUserData, User } from '../../../../types/management/user-manager';
+import { AuthService } from '../../../core/services/auth.service';
 import { RoleManagerService } from '../role-manager/role-manager.service';
 
 interface UserRole extends Role {
   $checked?: boolean;
+}
+
+interface UserOperationEnabled extends OperationsEnabled {
+  setRole: { enabled: boolean };
+  resetPassword: { enabled: boolean };
 }
 
 @Component({
@@ -251,7 +257,14 @@ export class UserManagerComponent {
     status: 'active',
     level: '1'
   };
-
+  operationsEnabled: UserOperationEnabled = {
+    create: { enabled: this.authService.hasPermission('POST', 'system:create-one-user') },
+    update: { enabled: this.authService.hasPermission('PUT', 'system:update-one-user') },
+    delete: { enabled: this.authService.hasPermission('DELETE', 'system:delete-one-user') },
+    detail: { enabled: this.authService.hasPermission('GET', 'system:get-one-user') },
+    setRole: { enabled: this.authService.hasPermission('PUT', 'system:update-user-role') },
+    resetPassword: { enabled: this.authService.hasPermission('PUT', 'system:reset-user-password') }
+  };
   userRoles: UserRole[] = [];
   rolesLoading = false;
   roles: UserRole[] = [];
@@ -293,6 +306,7 @@ export class UserManagerComponent {
   constructor(
     private cdr: ChangeDetectorRef,
     private dialogService: DialogService,
+    private authService: AuthService,
     private userManagerService: UserManagerService,
     private roleManagerService: RoleManagerService
   ) {

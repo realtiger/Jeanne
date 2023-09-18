@@ -11,7 +11,7 @@ export class SystemLogService {
   constructor(private http: HttpClient) {}
 
   getSystemLogList(listParams: ListParams) {
-    const url = '/api/admin/operation_record';
+    const url = '/api/admin/operation-record';
     const params = genHttpParams(listParams);
 
     return this.http.get<UniversalResponse<ListItems<SystemLog>>>(url, { params }).pipe(

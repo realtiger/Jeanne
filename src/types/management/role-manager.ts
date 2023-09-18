@@ -4,6 +4,7 @@ import { DetailConfig, FormConfig, StatusShowTitleDict, TableColumns } from '../
 interface Role extends QueryAdditionalFields {
   name: string;
   detail: string;
+  permissions: number[];
 }
 
 interface CreateRole {

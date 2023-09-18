@@ -2,19 +2,20 @@
   class="menu"
   [data]="data"
   [menuItemTemplate]="menuTemplate"
-  [linkType]="'routerLink'"
+  [itemTemplate]="menuTemplate"
+  [linkType]="'dependOnLinkTypeKey'"
   [accordionType]="'embed'"
   [autoOpenActiveMenu]="true"
   [noContentTemplate]="noContentTemplate"
 ></d-accordion>
 
 <ng-template #menuTemplate let-menu="item">
-  <i [class]="menu.menuIcon" style="margin-right: 8px"></i>
+  <i *ngIf="menu.menuIcon && menu.menuIcon.length > 0" [class]="menu.menuIcon" style="margin-right: 8px; display: inline"></i>
   {{ menu.title }}
 </ng-template>
 
 <ng-template #noContentTemplate let-deepth="deepth">
   <li class="devui-accordion-item disabled">
-    <div class="devui-accordion-item-title devui-over-flow-ellipsis disabled" [style.text-indent.px]="deepth * 20"> 没有可用的菜单项 </div>
+    <div class="devui-accordion-item-title devui-over-flow-ellipsis disabled" [style.text-indent.px]="deepth * 20"> 没有可用的菜单项</div>
   </li>
 </ng-template>

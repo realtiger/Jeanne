@@ -1,0 +1,87 @@
+<app-page-content
+  [name]="'带外信息管理'"
+  [tableColumns]="columns"
+  [showTitleDict]="showTitleDict"
+  [createFormConfig]="createFormConfig"
+  [createDefaultData]="createDefaultData"
+  [updateFormConfig]="updateFormConfig"
+  [detailConfig]="detailConfig"
+  [operationsEnabled]="operationsEnabled"
+  [multiChecked]="true"
+  [operationTpl]="operationTpl"
+  (loadFunc)="loadData($event)"
+  (createFunc)="createTag($event)"
+  (updateFunc)="updateTag($event)"
+  (deleteFunc)="deleteTag($event)"
+  (batchDeleteFunc)="batchDeleteTag($event)"
+  (detailFunc)="getTagDetail($event)"
+></app-page-content>
+
+<ng-template #operationTpl let-item>
+  <d-button icon="icon-publish" bsStyle="text-dark" title="执行操作" (click)="openOperationDialog(item)"></d-button>
+</ng-template>
+
+<ng-template #serverAdminOperationDialogTemplate>
+  {{ ipmiResultContent }}
+  <d-alert [type]="'info'" [closeable]="false">以下内容没有实现，仅作为占位符出现</d-alert>
+  <d-row class="operation-dialog">
+    <d-col [dSpan]="12">
+      <d-button>获取传感器监控数值</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>查看底盘信息</d-button>
+    </d-col>
+
+    <!-- 远程电源整理 -->
+    <d-col [dSpan]="12">
+      <d-button>开启电源</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>关闭电源（等效按开机按钮）</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>重启电源</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>强制关机（等效直接断电）</d-button>
+    </d-col>
+
+    <!-- 远程引导 -->
+    <d-col [dSpan]="24">
+      <d-alert [type]="'info'">设置下次引导启动项，生效一次</d-alert>
+    </d-col>
+    <d-col [dSpan]="8">
+      <d-button>网络引导</d-button>
+    </d-col>
+    <d-col [dSpan]="8">
+      <d-button>硬盘引导</d-button>
+    </d-col>
+    <d-col [dSpan]="8">
+      <d-button>光盘引导</d-button>
+    </d-col>
+
+    <!-- 系统日志 -->
+    <d-col [dSpan]="12">
+      <d-button>查看系统日志</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>清除系统日志</d-button>
+    </d-col>
+
+    <!-- 启动设置 -->
+    <d-col [dSpan]="12">
+      <d-button>重启后从bios启动</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>重启后从PXE启动</d-button>
+    </d-col>
+
+    <!-- bmc操作 -->
+    <d-col [dSpan]="12">
+      <d-button>热重启bmc</d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button>冷重启bmc</d-button>
+    </d-col>
+  </d-row>
+</ng-template>

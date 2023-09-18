@@ -21,13 +21,18 @@ import { CreateDataParams, DeleteDataParams, DetailDataParams, OperationsEnabled
 import { WebsocketHandler } from '../../../core/net/websocket-handler';
 import { AuthService } from '../../../core/services/auth.service';
 import { TokenService } from '../../../core/services/token.service';
-import { BaseCrudComponentService } from '../../../shared/base-crud.service';
+import { BaseCrudComponentService, TransformDict } from '../../../shared/base-crud.service';
 import { CommonToolsService } from '../../../shared/common-tools.service';
 import { getUpdateParams } from '../../../shared/utils';
 import { TagManagerService } from '../tag-manager/tag-manager.service';
 
 interface Server2ServerTag extends Tag {
   $checked?: boolean;
+}
+
+interface ServerOperationEnabled extends OperationsEnabled {
+  terminal: { enabled: boolean };
+  setServerTags: { enabled: boolean };
 }
 
 @Component({
@@ -52,18 +57,20 @@ export class ServerManagerComponent {
   @ViewChild('terminalContentTemplate', { static: true }) terminalContentTemplate?: TemplateRef<any>;
   @ViewChild('setServerTagsTemplate', { static: true }) setServerTagsTemplate: TemplateRef<any> | undefined;
 
-  transformDict: Array<string | { source: string; dest: string }> = [{ source: 'serverTags', dest: 'server_tags' }];
+  transformDict: TransformDict = [{ source: 'serverTags', dest: 'server_tags' }];
   showTitleDict = ShowTitleDict;
   columns = ServerColumns;
   createDefaultData = ServerCreateDefaultData;
   createFormConfig = ServerCreateFormConfig;
   updateFormConfig = ServerUpdateFormConfig;
   detailConfig = ServerDetailConfig;
-  operationsEnabled: OperationsEnabled = {
+  operationsEnabled: ServerOperationEnabled = {
     create: { enabled: this.authService.hasPermission('POST', 'cmdb:create-one-server') },
     update: { enabled: this.authService.hasPermission('PUT', 'cmdb:update-one-server') },
     delete: { enabled: this.authService.hasPermission('DELETE', 'cmdb:delete-one-server') },
-    detail: { enabled: this.authService.hasPermission('GET', 'cmdb:get-one-server') }
+    detail: { enabled: this.authService.hasPermission('GET', 'cmdb:get-one-server') },
+    terminal: { enabled: this.authService.hasPermission('GET', 'cmdb:get-one-server') },
+    setServerTags: { enabled: this.authService.hasPermission('PUT', 'cmdb:update-server-tag') }
   };
 
   server2ServerTags: Server2ServerTag[] = [];
@@ -126,13 +133,17 @@ export class ServerManagerComponent {
   loadData = (params: LoadDataParams) => this.baseCrudComponentService.loadData(this.serverManagerService, params, this.transformDict);
 
   createServer(params: CreateDataParams) {
-    const body: CreateServerBody = getUpdateParams(params.formData, this.transformDict);
+    const fields = this.createFormConfig.items.map(item => item.prop);
+
+    const body: CreateServerBody = getUpdateParams(params.formData, fields, this.transformDict);
     body.created_by = 'Manual';
     this.baseCrudComponentService.createRecord(this.serverManagerService, body, params.callback, this.transformDict);
   }
 
   updateServer(params: UpdateDataParams) {
-    const body: UpdateServerBody = getUpdateParams(params.formData, this.transformDict);
+    const fields = this.updateFormConfig.items.map(item => item.prop);
+
+    const body: UpdateServerBody = getUpdateParams(params.formData, fields, this.transformDict);
     this.baseCrudComponentService.updateRecord(this.serverManagerService, params.id, body, params.callback, this.transformDict);
   }
 
@@ -253,7 +264,6 @@ export class ServerManagerComponent {
     this.serverTags = [];
 
     this.selectServer = row;
-    console.log(row);
     this.serverTagsLoading = true;
     if (this.selectServer.serverTags.length > 0) {
       this.tagManagerService.getRecordList({ index: this.serverTagsPage.index, limit: this.serverTagsPage.limit, ids: this.selectServer.serverTags }).subscribe({

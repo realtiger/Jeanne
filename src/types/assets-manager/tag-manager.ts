@@ -1,6 +1,7 @@
 import { QueryAdditionalFields, UpdateAdditionalFields } from '../global';
 import { DetailConfig, FormConfig, StatusShowTitleDict, TableColumns } from '../layout';
 
+// ######## service data define ########
 interface CreateTagBody {
   name: string;
   detail: string;
@@ -10,6 +11,7 @@ interface Tag extends QueryAdditionalFields, CreateTagBody {}
 
 interface UpdateTagBody extends Partial<CreateTagBody>, UpdateAdditionalFields {}
 
+// ######## component data define ########
 const ShowTitleDict = { ...StatusShowTitleDict };
 
 const TagColumns: TableColumns[] = [

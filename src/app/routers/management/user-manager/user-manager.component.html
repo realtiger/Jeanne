@@ -15,7 +15,7 @@
           <tbody dTableBody>
             <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex">
               <!-- 新建用户行 -->
-              <tr dTableRow *ngIf="rowIndex === 0">
+              <tr dTableRow *ngIf="rowIndex === 0 && operationsEnabled.create?.enabled">
                 <td dTableCell [attr.colspan]="tableColumns.length + 2">
                   <div *ngIf="!showCreateForm" (click)="openCreateUserForm()" class="cursor-pointer" tabindex="0" (keyup.enter)="openCreateUserForm()">
                     <span class="tips-icon icon-add"></span>
@@ -47,10 +47,16 @@
                   <span *ngIf="column.fieldType === 'date'">{{ rowItem[column.field] | date : 'yyyy-MM-dd' }}</span>
                 </td>
                 <td>
-                  <d-button icon="icon-edit" bsStyle="text-dark" title="编辑" (click)="openEditUserForm(rowItem)"></d-button>
-                  <d-button icon="icon-delete" bsStyle="text-dark" title="删除" (click)="openDeleteUserForm(rowItem)"></d-button>
-                  <d-button icon="icon-set-role" bsStyle="text-dark" title="设置角色" (click)="openSetRoleForm(rowItem)"></d-button>
-                  <d-button icon="icon-clear-style" bsStyle="text-dark" title="重置密码" (click)="openResetPasswordForm(rowItem)"></d-button>
+                  <d-button *ngIf="operationsEnabled.update?.enabled" icon="icon-edit" bsStyle="text-dark" title="编辑" (click)="openEditUserForm(rowItem)"></d-button>
+                  <d-button *ngIf="operationsEnabled.delete?.enabled" icon="icon-delete" bsStyle="text-dark" title="删除" (click)="openDeleteUserForm(rowItem)"></d-button>
+                  <d-button *ngIf="operationsEnabled.setRole.enabled" icon="icon-set-role" bsStyle="text-dark" title="设置角色" (click)="openSetRoleForm(rowItem)"></d-button>
+                  <d-button
+                    *ngIf="operationsEnabled.resetPassword.enabled"
+                    icon="icon-clear-style"
+                    bsStyle="text-dark"
+                    title="重置密码"
+                    (click)="openResetPasswordForm(rowItem)"
+                  ></d-button>
                 </td>
               </tr>
             </ng-template>
