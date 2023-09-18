@@ -69,7 +69,7 @@
                 </td>
               </tr>
               <!-- 具体内容展示表格的行 -->
-              <tr dTableRow>
+              <tr dTableRow *ngIf="rowItem.id > 0">
                 <td dTableCell *ngIf="multiChecked">
                   <d-checkbox [(ngModel)]="rowItem.$checked" (ngModelChange)="checkStatusChange()"></d-checkbox>
                 </td>

@@ -1,5 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 
+import { TransformDict } from './base-crud.service';
 import { ListParams, ResponseStatus } from '../../types/global';
 import { FormData } from '../../types/layout';
 
@@ -27,11 +28,28 @@ function genHttpParams(listParams: ListParams) {
   return params;
 }
 
-function getUpdateParams(formData: FormData, fields: Array<string | { source: string; dest: string }>) {
+function getUpdateParams(formData: FormData, fields: string[], transformDict?: TransformDict) {
   const body: any = {};
+  const allFields: TransformDict = [...fields];
   let source = '';
   let dest = '';
-  for (const field of fields) {
+
+  transformDict?.forEach(value => {
+    if (typeof value === 'object') {
+      if (allFields.includes(value.source)) {
+        const index = allFields.indexOf(value.source);
+        allFields[index] = value;
+      } else {
+        allFields.push(value);
+      }
+    } else {
+      if (!allFields.includes(value)) {
+        allFields.push(value);
+      }
+    }
+  });
+
+  for (const field of allFields) {
     if (typeof field === 'object') {
       source = field.source;
       dest = field.dest;

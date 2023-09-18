@@ -7,7 +7,7 @@ import { EmptyListItems, ListItems, ListParams, LoadDataParams, UniversalRespons
 import { Callback, ServiceWithBaseCrud } from '../../types/layout';
 import { CommonToastService } from '../core/services/common-toast.service';
 
-type TransformDict = Array<string | { source: string; dest: string }>;
+export type TransformDict = Array<string | { source: string; dest: string }>;
 
 // ####### Service 方法 ########
 @Injectable({ providedIn: 'root' })

@@ -101,6 +101,7 @@ export class PageContentComponent implements OnInit {
   @Input() createType: 'inline' | 'modal' = 'inline';
   @Input() operationsMoreVisible = false;
   @Input() multiChecked = false;
+  @Input() showOperationColumn = false;
 
   @Output() loadFunc = new EventEmitter<LoadDataParams>();
   @Output() createFunc = new EventEmitter<CreateDataParams>();
@@ -187,6 +188,7 @@ export class PageContentComponent implements OnInit {
 
   hasOperationsEnabled() {
     return (
+      this.showOperationColumn ||
       (this.operationsEnabled.delete && this.deleteFunc.observed) ||
       (this.operationsEnabled.update && this.updateFunc.observed) ||
       (this.operationsEnabled.detail && this.detailFunc.observed)
@@ -228,6 +230,10 @@ export class PageContentComponent implements OnInit {
   loadDataCallback(success: boolean, res?: ListItems<any>) {
     if (success && res) {
       this.records = res.items;
+      if (this.records.length === 0) {
+        // 保证当 create 使用 inline 模式时，table 能显示一行，将创建按钮渲染出来
+        this.records = [{ id: 0 }];
+      }
       this.page = res.pagination;
       this.loading = false;
       this.recordAllChecked = false;
