@@ -24,9 +24,14 @@ import { TokenService } from '../../../core/services/token.service';
 import { BaseCrudComponentService, TransformDict } from '../../../shared/base-crud.service';
 import { CommonToolsService } from '../../../shared/common-tools.service';
 import { getUpdateParams } from '../../../shared/utils';
+import { ServerAdminManagerService } from '../server-admin-manager/server-admin-manager.service';
 import { TagManagerService } from '../tag-manager/tag-manager.service';
 
 interface Server2ServerTag extends Tag {
+  $checked?: boolean;
+}
+
+interface Server2ServerAdmin extends Tag {
   $checked?: boolean;
 }
 
@@ -56,8 +61,12 @@ interface ServerOperationEnabled extends OperationsEnabled {
 export class ServerManagerComponent {
   @ViewChild('terminalContentTemplate', { static: true }) terminalContentTemplate?: TemplateRef<any>;
   @ViewChild('setServerTagsTemplate', { static: true }) setServerTagsTemplate: TemplateRef<any> | undefined;
+  @ViewChild('addServerAdminTemplate', { static: true }) addServerAdminTemplate: TemplateRef<any> | undefined;
 
-  transformDict: TransformDict = [{ source: 'serverTags', dest: 'server_tags' }];
+  transformDict: TransformDict = [
+    { source: 'serverTags', dest: 'server_tags' },
+    { source: 'serverAdminInfo', dest: 'server_admin_info' }
+  ];
   showTitleDict = ShowTitleDict;
   columns = ServerColumns;
   createDefaultData = ServerCreateDefaultData;
@@ -85,6 +94,15 @@ export class ServerManagerComponent {
   selectServer: Server | null = null;
   modelRef: { modalInstance: ModalComponent } | null = null;
 
+  serverAdmins: Server2ServerAdmin[] = [];
+  serverAdminsLoading = false;
+  serverAdminsPage = {
+    index: 1,
+    limit: 50,
+    total: 0
+  };
+  server2ServerAdminChosen = 0;
+
   terminalTabs: TerminalTabItem[] = [];
   terminalTabActiveId: string | number = 0;
   terminalDrawer: IDrawerOpenResult | null = null;
@@ -100,6 +118,7 @@ export class ServerManagerComponent {
     private tokenService: TokenService,
     private serverManagerService: ServerManagerService,
     private tagManagerService: TagManagerService,
+    private serverAdminManagerService: ServerAdminManagerService,
     private baseCrudComponentService: BaseCrudComponentService<Server, ServerManagerService>
   ) {
     // 将 updateFormConfig.items 和 createFormConfig.items 进行合并，以 prop 字段作为唯一标识
@@ -316,7 +335,9 @@ export class ServerManagerComponent {
             break;
           }
         }
-        this.serverTagsPage = value.pagination;
+        if (value.pagination) {
+          this.serverTagsPage = value.pagination;
+        }
         this.cdr.detectChanges();
       }
     });
@@ -408,4 +429,82 @@ export class ServerManagerComponent {
   }
 
   // ###### end 服务器标签管理 #######
+
+  // ###### begin 服务器添加管理端 #######
+  openAddServerAdminForm(row: Server) {
+    // 初始化操作
+    this.serverAdminsPage = {
+      index: 1,
+      limit: 50,
+      total: 0
+    };
+    this.serverAdmins = [];
+    this.selectServer = row;
+    this.server2ServerAdminChosen = this.selectServer.serverAdminInfo.id || 0;
+    console.log(this.server2ServerAdminChosen);
+    this.serverAdminsLoading = true;
+    this.loadServerAdmins();
+
+    if (this.addServerAdminTemplate) {
+      this.modelRef = this.dialogService.open({
+        id: 'add-server-admin-dialog',
+        width: '600px',
+        maxHeight: '600px',
+        title: '增加服务器bmc',
+        contentTemplate: this.addServerAdminTemplate,
+        backdropCloseable: true,
+        onClose: () => {
+          this.selectServer = null;
+        },
+        buttons: []
+      });
+    }
+  }
+
+  closeAddServerAdminForm() {
+    this.modelRef?.modalInstance.hide();
+  }
+
+  loadServerAdmins(index = 1, limit = 50) {
+    this.serverAdminsLoading = true;
+    this.serverAdminManagerService.getRecordList({ index, limit }).subscribe({
+      next: value => {
+        this.serverAdminsLoading = false;
+        this.serverAdmins = value.items;
+        if (value.pagination) {
+          this.serverAdminsPage = value.pagination;
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  server2ServerAdminsPageSizeChange(pageSize: number) {
+    this.loadServerAdmins(this.serverAdminsPage.index, pageSize);
+  }
+
+  server2ServerAdminsPageIndexChange(pageIndex: number) {
+    this.loadServerAdmins(pageIndex, this.serverAdminsPage.limit);
+  }
+
+  addServerAdmin() {
+    if (this.selectServer?.server_admin_info.id === this.server2ServerAdminChosen) {
+      return;
+    }
+    this.serverAdminsLoading = true;
+
+    this.serverManagerService.addServerAdmin(this.selectServer?.id || 0, this.server2ServerAdminChosen).subscribe({
+      next: value => {
+        this.serverAdminsLoading = false;
+        if (this.selectServer) {
+          this.selectServer.server_admin_info = value.serverAdminInfo;
+        }
+      },
+      error: () => {
+        this.serverAdminsLoading = false;
+      }
+    });
+  }
+
+  // ###### end 服务器添加管理端 #######
 }

@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { DialogService, ModalComponent, TableWidthConfig } from 'ng-devui';
+import { Subscription } from 'rxjs';
 
+import { PageContentService } from './page-content.service';
 import { ListItems, ListParams, LoadDataParams } from '../../../types/global';
 import {
   BatchDeleteDataParams,
@@ -46,43 +48,15 @@ const DEFAULT_OPERATIONS_ENABLED: Required<OperationsEnabled> = {
 @Component({
   selector: 'app-page-content',
   templateUrl: './page-content.component.html',
-  styles: [
-    `
-      d-row {
-        font-size: 16px;
-
-        d-col {
-          color: #00000080;
-
-          &:first-child {
-            div {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              text-align: right;
-
-              &:after {
-                content: ':';
-                margin: 0 8px 0 2px;
-              }
-            }
-          }
-        }
-      }
-
-      .list-header-operation {
-        display: flex;
-        justify-content: space-between;
-      }
-    `
-  ],
+  styleUrls: ['./page-content.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PageContentComponent implements OnInit {
+export class PageContentComponent implements OnInit, OnDestroy {
   @ViewChild('createTemplate', { static: true }) createTemplate: TemplateRef<any> | undefined;
   @ViewChild('editorTemplate', { static: true }) editorTemplate: TemplateRef<any> | undefined;
   @ViewChild('detailTemplate', { static: true }) detailTemplate: TemplateRef<any> | undefined;
 
+  @Input() headerTpl: TemplateRef<any> | null = null;
   @Input() operationTpl: TemplateRef<{ $implicit: any }> | null = null;
   @Input() operationMoreTpl: TemplateRef<{ $implicit: any }> | null = null;
   @Input() operationHeaderLeftTpl: TemplateRef<any> | null = null;
@@ -102,6 +76,8 @@ export class PageContentComponent implements OnInit {
   @Input() operationsMoreVisible = false;
   @Input() multiChecked = false;
   @Input() showOperationColumn = false;
+  // 是否前端分页，默认后端分页
+  @Input() frontPagination = false;
 
   @Output() loadFunc = new EventEmitter<LoadDataParams>();
   @Output() createFunc = new EventEmitter<CreateDataParams>();
@@ -110,6 +86,7 @@ export class PageContentComponent implements OnInit {
   @Output() batchDeleteFunc = new EventEmitter<BatchDeleteDataParams>();
   @Output() detailFunc = new EventEmitter<DetailDataParams>();
 
+  showRecords: any[] = [];
   loading = false;
   formLoading = false;
   page = {
@@ -120,6 +97,7 @@ export class PageContentComponent implements OnInit {
   };
   recordAllChecked = false;
   recordHalfChecked = false;
+  reloadBehaviorSubject$?: Subscription;
 
   selectRecord: any;
   modelRef: { modalInstance: ModalComponent } | null = null;
@@ -135,11 +113,20 @@ export class PageContentComponent implements OnInit {
     return this.records.filter(i => i.$checked);
   }
 
-  constructor(private cdr: ChangeDetectorRef, private dialogService: DialogService) {}
+  constructor(private cdr: ChangeDetectorRef, private dialogService: DialogService, private pageContentService: PageContentService) {}
 
   ngOnInit() {
     this.loadData(this.page.index, this.page.limit);
     this.mergeOperationsEnabled();
+    this.reloadBehaviorSubject$ = this.pageContentService.reloadBehaviorSubject$.subscribe(value => {
+      if (value) {
+        this.loadData(this.page.index, this.page.limit);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.reloadBehaviorSubject$?.unsubscribe();
   }
 
   mergeOperationsEnabled() {
@@ -212,11 +199,28 @@ export class PageContentComponent implements OnInit {
     return recordName;
   }
 
-  showContentTranslate(field: string, sourceValue?: string) {
+  getRowItemValue(field: string, rowItem: any) {
+    // 将field按照.分割，然后逐层取值
+    const fieldList = field.split('.');
+    let value = rowItem;
+    for (const item of fieldList) {
+      value = value[item];
+      if (!value) {
+        break;
+      }
+    }
+    return value;
+  }
+
+  showContentTranslate(field: string, rowItem: any) {
     let value;
+    let sourceValue = this.getRowItemValue(field, rowItem);
+    if (typeof sourceValue === 'object' && sourceValue['value']) {
+      sourceValue = sourceValue['value'];
+    }
 
     if (this.showTitleDict[field]) {
-      value = this.showTitleDict[field][sourceValue || ''] || sourceValue;
+      value = this.showTitleDict[field][sourceValue];
     } else {
       value = sourceValue;
     }
@@ -230,11 +234,20 @@ export class PageContentComponent implements OnInit {
   loadDataCallback(success: boolean, res?: ListItems<any>) {
     if (success && res) {
       this.records = res.items;
-      if (this.records.length === 0) {
-        // 保证当 create 使用 inline 模式时，table 能显示一行，将创建按钮渲染出来
-        this.records = [{ id: 0 }];
+      // 根据前端分页还是后端分页，决定是否需要对 records 进行分页
+      if (typeof res.pagination === 'undefined' || this.frontPagination) {
+        this.frontPagination = true;
+        this.page.total = res.items.length;
+        this.page.offset = (this.page.index - 1) * this.page.limit;
+        this.showRecords = this.records.slice(this.page.offset, this.page.offset + this.page.limit);
+      } else {
+        this.showRecords = this.records;
       }
-      this.page = res.pagination;
+      if (this.showRecords.length === 0) {
+        // 保证当 create 使用 inline 模式时，table 能显示一行，将创建按钮渲染出来
+        this.showRecords = [{ id: 0 }];
+      }
+
       this.loading = false;
       this.recordAllChecked = false;
       this.recordHalfChecked = false;
@@ -255,12 +268,22 @@ export class PageContentComponent implements OnInit {
 
   onPageChange(pageIndex: number) {
     this.page.index = pageIndex;
-    this.loadData(pageIndex, this.page.limit);
+
+    if (this.frontPagination) {
+      this.showRecords = this.records.slice((pageIndex - 1) * this.page.limit, pageIndex * this.page.limit);
+    } else {
+      this.loadData(pageIndex, this.page.limit);
+    }
   }
 
   onSizeChange(pageSize: number) {
     this.page.limit = pageSize;
-    this.loadData(this.page.index, pageSize);
+
+    if (this.frontPagination) {
+      this.showRecords = this.records.slice((this.page.index - 1) * pageSize, this.page.index * pageSize);
+    } else {
+      this.loadData(this.page.index, pageSize);
+    }
   }
 
   // ########### check handler begin ###########

@@ -51,5 +51,30 @@ export const environment: Environment = {
       menuIcon: 'icon-setting',
       children: [{ title: '系统日志', link: '/system-manager/system-log', linkType: 'routerLink', needPermission: ['system:get-one-operation-record'] }]
     }
+  ],
+  kubeMenu: [
+    {
+      title: 'k8s集群仪表盘',
+      menuIcon: 'icon-dashboard',
+      link: '/kube/dashboard',
+      linkType: 'routerLink'
+    },
+    {
+      title: '集群负载',
+      menuIcon: 'icon-build-with-tool',
+      children: [
+        { title: 'Deployment', link: '/kube/deployments', linkType: 'routerLink', needPermission: ['kube:get-all-namespaced-deployment'] },
+        { title: 'StatefulSet', link: '/kube/stateful-sets', linkType: 'routerLink', needPermission: ['kube:get-all-namespaced-stateful-set'] },
+        { title: 'DaemonSet', link: '/kube/daemon-sets', linkType: 'routerLink', needPermission: ['kube:get-all-namespaced-daemon-set'] },
+        { title: 'Job', link: '/kube/jobs', linkType: 'routerLink', needPermission: ['kube:get-all-namespaced-job'] },
+        { title: 'CronJob', link: '/kube/cron-jobs', linkType: 'routerLink', needPermission: ['kube:get-all-namespaced-cron-job'] },
+        { title: 'Pod', link: '/kube/pods', linkType: 'routerLink', needPermission: ['kube:get-all-namespaced-pod'] }
+      ]
+    },
+    {
+      title: '全局管理',
+      menuIcon: 'icon-setting',
+      children: [{ title: 'k8s配置', link: '/kube/kube-settings', linkType: 'routerLink', needPermission: ['kube:get-all-kube-settings'] }]
+    }
   ]
 };

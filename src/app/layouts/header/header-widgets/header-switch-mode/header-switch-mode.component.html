@@ -1,0 +1,13 @@
+<div class="operations-switch" dDropDown trigger="hover" appendToBody dDropDownToggle>
+  <span class="icon-switch"></span>
+  <ul dDropDownMenu class="devui-dropdown-menu devui-scrollbar" role="menu">
+    <ng-container>
+      <li role="menuitem">
+        <a class="devui-dropdown-item" [routerLink]="['/']"><i class="icon icon-dashboard"></i> 管理界面</a>
+      </li>
+      <li role="menuitem">
+        <a class="devui-dropdown-item" [routerLink]="['/kube', 'dashboard']"><i class="icon icon-build-with-tool"></i> kube集群 </a>
+      </li>
+    </ng-container>
+  </ul>
+</div>

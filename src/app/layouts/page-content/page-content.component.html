@@ -1,5 +1,8 @@
 <div class="list-wrap">
-  <app-page-header></app-page-header>
+  <ng-container *ngTemplateOutlet="headerTpl || defaultHeaderTpl"></ng-container>
+  <ng-template #defaultHeaderTpl>
+    <app-page-header></app-page-header>
+  </ng-template>
 
   <div class="content-wrapper">
     <div class="list-container" dLoading [loading]="loading" [backdrop]="true">
@@ -31,7 +34,7 @@
         </div>
       </div>
       <div class="list-content">
-        <d-data-table [dataSource]="records" [scrollable]="true" [tableWidthConfig]="tableWidthConfig">
+        <d-data-table [dataSource]="showRecords" [scrollable]="true" [tableWidthConfig]="tableWidthConfig">
           <thead dTableHead>
             <tr dTableRow>
               <th dHeadCell *ngIf="multiChecked">
@@ -69,7 +72,7 @@
                 </td>
               </tr>
               <!-- 具体内容展示表格的行 -->
-              <tr dTableRow *ngIf="rowItem.id > 0">
+              <tr dTableRow *ngIf="rowItem.id">
                 <td dTableCell *ngIf="multiChecked">
                   <d-checkbox [(ngModel)]="rowItem.$checked" (ngModelChange)="checkStatusChange()"></d-checkbox>
                 </td>
@@ -77,13 +80,22 @@
                 <td dTableCell>{{ rowIndex + 1 }}</td>
                 <!-- 显示定义tableColumns中对应字段的内容的列 -->
                 <td dTableCell *ngFor="let column of tableColumns">
-                  <span *ngIf="column.fieldType === 'text'">{{ showContentTranslate(column.field, rowItem[column.field]) }}</span>
+                  <span *ngIf="column.fieldType === 'text'">{{ showContentTranslate(column.field, rowItem) }}</span>
                   <d-tag
                     *ngIf="column.fieldType === 'tag'"
-                    [tag]="showContentTranslate(column.field, rowItem[column.field])"
-                    [labelStyle]="column.field + '-' + rowItem[column.field]"
+                    [tag]="showContentTranslate(column.field, rowItem)"
+                    [labelStyle]="column.field + '-' + getRowItemValue(column.field, rowItem)"
                   ></d-tag>
-                  <span *ngIf="column.fieldType === 'date'">{{ rowItem[column.field] | date : 'yyyy-MM-dd' }}</span>
+                  <span *ngIf="column.fieldType === 'date'">{{ getRowItemValue(column.field, rowItem) | date : 'yyyy-MM-dd' }}</span>
+                  <div *ngIf="column.fieldType === 'statusText'">
+                    <d-status [type]="getRowItemValue(column.field, rowItem)['status'] || 'initial'">{{ showContentTranslate(column.field, rowItem) }}</d-status>
+                  </div>
+                  <span *ngIf="column.fieldType === 'boolean'">
+                    <d-icon
+                      [icon]="getRowItemValue(column.field, rowItem) ? 'icon-right-o' : 'icon-error-o'"
+                      [color]="getRowItemValue(column.field, rowItem) ? '#50d4ab' : '#f66f6a'"
+                    ></d-icon>
+                  </span>
                 </td>
                 <!-- 操作按钮的列 -->
                 <td *ngIf="hasOperationsEnabled()">

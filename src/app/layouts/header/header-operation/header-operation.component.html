@@ -1,40 +1,9 @@
 <div class="header-operation">
   <div class="operations">
-    <d-search class="header-search" [iconPosition]="'left'" [noBorder]="true" (searchFn)="onSearch($event)"></d-search>
-    <!-- TODO 修改帮助文档地址 -->
-    <a href="https://example.com/docs" target="_blank"> <i class="icon icon-helping"></i> </a>
-    <div class="operations-notice" dDropDown trigger="click" dDropDownToggle appendToBody closeScope="blank">
-      <d-badge [count]="noticeCount"><i class="icon icon-notice"></i></d-badge>
-      <div class="notice-modal" dDropDownMenu role="menu">
-        <app-header-operation-notice (countEvent)="handleNoticeCount($event)"></app-header-operation-notice>
-      </div>
-    </div>
-    <div class="operations-user" dDropDown trigger="hover" appendToBody dDropDownToggle>
-      <d-avatar [name]="user.username" [width]="22" [height]="22"></d-avatar>
-      <span class="user-name">{{ haveLoggedIn ? user.username : '用户操作' }}</span>
-      <ul dDropDownMenu class="devui-dropdown-menu devui-scrollbar" role="menu" style="min-width: 120px">
-        <ng-container *ngIf="haveLoggedIn">
-          <!-- TODO 用户链接修改 -->
-          <li role="menuitem">
-            <a class="devui-dropdown-item" [routerLink]="['/pages', 'user', 'center']"><i class="icon icon-mine"></i> 用户中心 </a>
-          </li>
-          <li role="menuitem">
-            <a class="devui-dropdown-item" [routerLink]="['/pages', 'user', 'settings']"><i class="icon icon-setting"></i> 用户设置 </a>
-          </li>
-          <li role="menuitem" (click)="handleUserOperation('logout')" tabindex="0" (keyup.enter)="handleUserOperation('logout')">
-            <a class="devui-dropdown-item logout"><i class="icon icon-exit"></i> 退出 </a>
-          </li>
-        </ng-container>
-
-        <ng-container *ngIf="!haveLoggedIn">
-          <li role="menuitem">
-            <a class="devui-dropdown-item" (click)="goToLogin()" tabindex="0" (keyup.enter)="goToLogin()"><i class="icon icon-assign"></i> 登录 </a>
-          </li>
-          <li role="menuitem">
-            <a class="devui-dropdown-item"><i class="icon icon-add-member"></i> 注册 </a>
-          </li>
-        </ng-container>
-      </ul>
-    </div>
+    <app-header-search></app-header-search>
+    <app-header-help></app-header-help>
+    <app-header-notice></app-header-notice>
+    <app-header-switch-mode></app-header-switch-mode>
+    <app-header-user></app-header-user>
   </div>
 </div>

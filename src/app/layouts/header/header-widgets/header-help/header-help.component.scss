@@ -1,0 +1,16 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+
+a {
+  color: $devui-text;
+}
+
+a:hover {
+  color: $devui-brand;
+}
+
+
+.icon.icon-helping {
+  margin: auto 12px;
+  cursor: pointer;
+}

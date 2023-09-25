@@ -1,0 +1,22 @@
+<app-page-content
+  [name]="'k8s配置'"
+  [tableColumns]="columns"
+  [showTitleDict]="showTitleDict"
+  [createFormConfig]="createFormConfig"
+  [createDefaultData]="createDefaultData"
+  [updateFormConfig]="updateFormConfig"
+  [detailConfig]="detailConfig"
+  [multiChecked]="true"
+  [operationsEnabled]="operationsEnabled"
+  [operationTpl]="operationTpl"
+  (loadFunc)="loadData($event)"
+  (createFunc)="createKubeSettings($event)"
+  (updateFunc)="updateKubeSettings($event)"
+  (deleteFunc)="deleteKubeSettings($event)"
+  (batchDeleteFunc)="batchDeleteKubeSettings($event)"
+  (detailFunc)="getKubeSettingsDetail($event)"
+></app-page-content>
+
+<ng-template #operationTpl let-item>
+  <d-button *ngIf="operationsEnabled.changeCurrentUse" icon="icon-milestone" bsStyle="text-dark" title="切换当前配置" (click)="changeCurrentUse(item)"></d-button>
+</ng-template>

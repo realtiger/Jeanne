@@ -1,0 +1,29 @@
+<div class="page-header">
+  <d-breadcrumb>
+    <d-breadcrumb-item *ngFor="let item of breadcrumbList">
+      <a [routerLink]="item.link">
+        <i class="icon" [ngClass]="item.icon" *ngIf="item.icon"></i>
+        {{ item.title }}
+      </a>
+    </d-breadcrumb-item>
+  </d-breadcrumb>
+  <div class="page-header-title kube-header-title">
+    <span><i *ngIf="titleIcon.length > 0" class="icon" [ngClass]="titleIcon"></i>{{ title }}</span>
+    <d-row [style]="{ minWidth: '320px' }">
+      <d-col [dSpan]="8">
+        <d-button [style]="{ width: '100%' }" [routerLink]="'/kube/kube-settings'">{{ kubeSetting?.name }}</d-button>
+      </d-col>
+      <d-col [dSpan]="16">
+        <d-select
+          [style]="{ width: '100%' }"
+          [options]="namespaces"
+          [valueKey]="'name'"
+          [filterKey]="'name'"
+          [(ngModel)]="currentNamespace"
+          (ngModelChange)="namespaceChange()"
+        ></d-select>
+      </d-col>
+    </d-row>
+  </div>
+  <div *ngIf="description.length > 0">{{ description }}</div>
+</div>

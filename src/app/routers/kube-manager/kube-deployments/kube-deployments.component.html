@@ -1,0 +1,20 @@
+<app-page-content
+  *ngIf="reload"
+  [name]="'Deployments'"
+  [tableWidthConfig]="kubeDeploymentTableWidthConfig"
+  [tableColumns]="columns"
+  [showTitleDict]="showTitleDict"
+  [createFormConfig]="createFormConfig"
+  [createDefaultData]="createDefaultData"
+  [updateFormConfig]="updateFormConfig"
+  [detailConfig]="detailConfig"
+  [multiChecked]="true"
+  [operationsEnabled]="operationsEnabled"
+  [headerTpl]="header"
+  [frontPagination]="true"
+  (loadFunc)="loadData($event)"
+></app-page-content>
+
+<ng-template #header>
+  <app-kube-header></app-kube-header>
+</ng-template>

@@ -1,3 +1,4 @@
+import { ServerAdminInfo } from './server-admin-manager';
 import { WebsocketHandler } from '../../app/core/net/websocket-handler';
 import { QueryAdditionalFields, UpdateAdditionalFields } from '../global';
 import { DetailConfig, FormConfig, StatusShowTitleDict, TableColumns } from '../layout';
@@ -16,6 +17,8 @@ interface Server extends QueryAdditionalFields {
   detail: string;
   serverTags: number[];
   server_tags: number[];
+  serverAdminInfo: ServerAdminInfo;
+  server_admin_info: ServerAdminInfo;
 }
 
 interface CreateServerBody {
@@ -76,6 +79,11 @@ const ServerColumns: TableColumns[] = [
   {
     field: 'region',
     header: '区域',
+    fieldType: 'text'
+  },
+  {
+    field: 'serverAdminInfo.name',
+    header: '管理bmc',
     fieldType: 'text'
   },
   {

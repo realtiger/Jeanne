@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AlertModule, ButtonModule, CheckBoxModule, DataTableModule, LayoutModule, PaginationModule, TabsModule } from 'ng-devui';
+import { AlertModule, ButtonModule, CheckBoxModule, DataTableModule, LayoutModule, PaginationModule, RadioModule, TabsModule } from 'ng-devui';
 
 import { AssetsManagerRoutingModule } from './assets-manager-routing.module';
 import { AssetsManagerComponent } from './assets-manager.component';
@@ -26,7 +26,8 @@ import { LayoutsModule } from '../../layouts/layouts.module';
     DataTableModule,
     LayoutModule,
     PaginationModule,
-    AlertModule
+    AlertModule,
+    RadioModule
   ],
   providers: [ServerManagerService, TagManagerService, ServerAdminManagerService]
 })

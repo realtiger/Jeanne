@@ -13,12 +13,14 @@ import {
   DatepickerModule,
   DropDownModule,
   FormModule,
+  IconModule,
   InputNumberModule,
   LayoutModule,
   LoadingModule,
   PaginationModule,
   SearchModule,
   SelectModule,
+  StatusModule,
   TabsModule,
   TagsModule,
   TextareaModule,
@@ -31,6 +33,11 @@ import { HeaderLogoComponent } from './header/header-logo/header-logo.component'
 import { HeaderNavbarComponent } from './header/header-navbar/header-navbar.component';
 import { HeaderOperationNoticeComponent } from './header/header-operation/header-operation-notice/header-operation-notice.component';
 import { HeaderOperationComponent } from './header/header-operation/header-operation.component';
+import { HeaderHelpComponent } from './header/header-widgets/header-help/header-help.component';
+import { HeaderNoticeComponent } from './header/header-widgets/header-notice/header-notice.component';
+import { HeaderSearchComponent } from './header/header-widgets/header-search/header-search.component';
+import { HeaderSwitchModeComponent } from './header/header-widgets/header-switch-mode/header-switch-mode.component';
+import { HeaderUserComponent } from './header/header-widgets/header-user/header-user.component';
 import { LayoutComponent } from './layout/layout.component';
 import { LayoutsService } from './layouts.service';
 import { OverallLayoutComponent } from './overall-layout/overall-layout.component';
@@ -53,7 +60,12 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
     PageHeaderComponent,
     PageFormComponent,
     PageTableComponent,
-    PageContentComponent
+    PageContentComponent,
+    HeaderSearchComponent,
+    HeaderHelpComponent,
+    HeaderNoticeComponent,
+    HeaderUserComponent,
+    HeaderSwitchModeComponent
   ],
   imports: [
     CommonModule,
@@ -82,7 +94,9 @@ import { SideMenuComponent } from './side-menu/side-menu.component';
     PaginationModule,
     DataTableModule,
     ToggleModule,
-    CheckBoxModule
+    CheckBoxModule,
+    StatusModule,
+    IconModule
   ],
   providers: [LayoutsService],
   exports: [FooterComponent, OverallLayoutComponent, PageHeaderComponent, PageFormComponent, PageContentComponent]

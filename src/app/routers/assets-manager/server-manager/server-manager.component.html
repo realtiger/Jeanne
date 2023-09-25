@@ -20,6 +20,7 @@
   <!--  先把 terminal 按钮隐藏 -->
   <!--  <d-button icon="icon-console" bsStyle="text" title="打开终端" (click)="openTerminal(item)"></d-button>-->
   <d-button *ngIf="operationsEnabled.setServerTags" icon="icon-milestone" bsStyle="text-dark" title="设置标签" (click)="openSetServerTagsForm(item)"></d-button>
+  <d-button *ngIf="operationsEnabled.setServerTags" icon="icon-plan" bsStyle="text-dark" title="添加" (click)="openAddServerAdminForm(item)"></d-button>
 </ng-template>
 
 <ng-template #terminalContentTemplate>
@@ -93,6 +94,50 @@
     </d-col>
     <d-col [dSpan]="12">
       <d-button bsStyle="common" (click)="closeSetServerTagsForm()" width="100%" [style]="{ width: '100%' }">取消</d-button>
+    </d-col>
+  </d-row>
+</ng-template>
+
+<ng-template #addServerAdminTemplate>
+  <div>
+    <span>所属bmc： {{ selectServer ? selectServer.serverAdminInfo.name : '' }}</span>
+    <d-data-table [dataSource]="serverAdmins" [scrollable]="true">
+      <thead dTableHead>
+        <tr dTableRow>
+          <th dHeadCell> #</th>
+          <th dHeadCell>管理名称</th>
+        </tr>
+      </thead>
+      <tbody dTableBody>
+        <ng-template let-rowItem="rowItem">
+          <tr dTableRow>
+            <td dTableCell class="devui-checkable-cell">
+              <d-radio [name]="'server-admin '" [value]="rowItem.id" [(ngModel)]="server2ServerAdminChosen"></d-radio>
+            </td>
+            <td dTableCell>{{ rowItem.name }}</td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </d-data-table>
+  </div>
+  <d-pagination
+    [total]="serverAdminsPage.total"
+    [(pageSize)]="serverAdminsPage.limit"
+    [(pageIndex)]="serverAdminsPage.index"
+    [canViewTotal]="true"
+    [canChangePageSize]="true"
+    [canJumpPage]="true"
+    (pageIndexChange)="server2ServerAdminsPageIndexChange($event)"
+    (pageSizeChange)="server2ServerAdminsPageSizeChange($event)"
+  ></d-pagination>
+  <d-row [dGutter]="12">
+    <d-col [dSpan]="12">
+      <d-button bsStyle="primary" [disabled]="serverAdminsLoading" (click)="addServerAdmin()" [showLoading]="serverAdminsLoading" width="100%" [style]="{ width: '100%' }">
+        {{ serverAdminsLoading ? '列表加载中...' : '设置' }}
+      </d-button>
+    </d-col>
+    <d-col [dSpan]="12">
+      <d-button bsStyle="common" (click)="closeAddServerAdminForm()" width="100%" [style]="{ width: '100%' }">取消</d-button>
     </d-col>
   </d-row>
 </ng-template>

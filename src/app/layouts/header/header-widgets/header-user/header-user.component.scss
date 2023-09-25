@@ -1,0 +1,31 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+.operations-user {
+  cursor: pointer;
+  margin: auto 12px;
+
+  .devui-dropdown-menu {
+    min-width: 120px;
+
+    .icon {
+      font-size: $devui-font-size;
+      margin-right: 8px;
+    }
+  }
+
+  .user-name {
+    margin-left: 8px;
+  }
+
+  d-avatar :host .devui-avatar-style {
+    background-color: $devui-brand;
+  }
+}
+
+@media only screen and (max-width: 620px) {
+  .operations-user {
+    .user-name {
+      display: none;
+    }
+  }
+}
