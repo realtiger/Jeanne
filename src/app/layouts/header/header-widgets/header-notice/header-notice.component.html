@@ -1,0 +1,6 @@
+<div class="operations-notice" dDropDown trigger="click" dDropDownToggle appendToBody closeScope="blank">
+  <d-badge [count]="noticeCount"><i class="icon icon-notice"></i></d-badge>
+  <div class="notice-modal" dDropDownMenu role="menu">
+    <app-header-operation-notice (countEvent)="handleNoticeCount($event)"></app-header-operation-notice>
+  </div>
+</div>
