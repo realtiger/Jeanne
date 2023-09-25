@@ -1,7 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-
-import { User } from '../../../../types/global';
-import { AuthService } from '../../../core/services/auth.service';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-header-operation',
@@ -9,45 +6,4 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./header-operation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HeaderOperationComponent {
-  noticeCount = 0;
-  user: User = this.authService.userInfo ? this.authService.userInfo : ({} as User);
-
-  get haveLoggedIn(): boolean {
-    return this.authService.isUserLoggedIn;
-  }
-
-  constructor(private cdr: ChangeDetectorRef, private authService: AuthService) {}
-
-  // TODO 补齐search能力
-  onSearch(event: string) {
-    console.log(event);
-  }
-
-  handleUserOperation(operation: 'logout' | 'other') {
-    switch (operation) {
-      case 'logout': {
-        this.authService.logout().subscribe({
-          next: () => {
-            this.goToLogin();
-          },
-          error: err => {
-            console.error(`退出登录失败：${err}`);
-          }
-        });
-        break;
-      }
-      default:
-        break;
-    }
-  }
-
-  handleNoticeCount(event: number) {
-    this.noticeCount = event;
-    this.cdr.detectChanges();
-  }
-
-  goToLogin(): void {
-    this.authService.gotoLogin();
-  }
-}
+export class HeaderOperationComponent {}

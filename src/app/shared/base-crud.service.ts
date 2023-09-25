@@ -108,19 +108,21 @@ export class BaseCrudComponentService<T, S extends ServiceWithBaseCrud> {
     item['updateTime' as keyof T] = item['update_time' as keyof T];
   }
 
-  loadData(service: S, params: LoadDataParams, transformDict?: TransformDict) {
+  loadData(service: S, params: LoadDataParams, transformDict?: TransformDict, callback?: Callback) {
     if (service.getRecordList) {
       service.getRecordList(params.params).subscribe({
         next: (res: ListItems<T>) => {
           // 如果有转换字典则先转换为前端常用格式
-          if (transformDict) {
+          if (transformDict && transformDict.length > 0) {
             for (const item of res.items) {
               this.transformResponseData(item, transformDict);
             }
           }
+          callback?.(true, res);
           params.callback(true, res);
         },
         error: () => {
+          callback?.(false);
           params.callback(false);
         }
       });

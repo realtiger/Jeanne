@@ -1,0 +1,27 @@
+<div class="operations-user" dDropDown trigger="hover" appendToBody dDropDownToggle>
+  <d-avatar [name]="user.username" [width]="22" [height]="22"></d-avatar>
+  <span class="user-name">{{ haveLoggedIn ? user.username : '用户操作' }}</span>
+  <ul dDropDownMenu class="devui-dropdown-menu devui-scrollbar" role="menu" style="min-width: 120px">
+    <ng-container *ngIf="haveLoggedIn">
+      <!-- TODO 用户链接修改 -->
+      <li role="menuitem">
+        <a class="devui-dropdown-item" [routerLink]="['/pages', 'user', 'center']"><i class="icon icon-mine"></i> 用户中心 </a>
+      </li>
+      <li role="menuitem">
+        <a class="devui-dropdown-item" [routerLink]="['/pages', 'user', 'settings']"><i class="icon icon-setting"></i> 用户设置 </a>
+      </li>
+      <li role="menuitem" (click)="handleUserOperation('logout')" tabindex="0" (keyup.enter)="handleUserOperation('logout')">
+        <a class="devui-dropdown-item logout"><i class="icon icon-exit"></i> 退出 </a>
+      </li>
+    </ng-container>
+
+    <ng-container *ngIf="!haveLoggedIn">
+      <li role="menuitem">
+        <a class="devui-dropdown-item" (click)="goToLogin()" tabindex="0" (keyup.enter)="goToLogin()"><i class="icon icon-assign"></i> 登录 </a>
+      </li>
+      <li role="menuitem">
+        <a class="devui-dropdown-item"><i class="icon icon-add-member"></i> 注册 </a>
+      </li>
+    </ng-container>
+  </ul>
+</div>

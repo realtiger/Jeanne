@@ -6,7 +6,7 @@ import { ListItems, ListParams } from './global';
 interface TableColumns {
   field: string;
   header: string;
-  fieldType: 'text' | 'tag' | 'date';
+  fieldType: 'text' | 'tag' | 'date' | 'statusText' | 'boolean';
 }
 
 interface FormConfigItem {

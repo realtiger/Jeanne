@@ -84,6 +84,8 @@ interface Environment {
   siteInfo: SiteInfo;
   // 菜单数据
   menu: MenuData[];
+  // k8s菜单数据
+  kubeMenu?: MenuData[];
 }
 
 interface MenuData extends AccordionMenuItem {
@@ -101,6 +103,12 @@ interface MenuData extends AccordionMenuItem {
   // 是否隐藏菜单
   hidden?: boolean;
   needPermission?: string[];
+}
+
+interface BreadcrumbItem {
+  title: string;
+  link?: string;
+  icon?: string;
 }
 
 interface UserPermission {
@@ -156,7 +164,7 @@ interface Pagination {
 
 interface ListItems<T> {
   items: T[];
-  pagination: Pagination;
+  pagination?: Pagination;
 }
 
 const EmptyListItems: ListItems<never> = {
@@ -200,6 +208,7 @@ export {
   ListItems,
   EmptyListItems,
   MenuData,
+  BreadcrumbItem,
   UserPermission,
   AppInfo,
   AppDate,

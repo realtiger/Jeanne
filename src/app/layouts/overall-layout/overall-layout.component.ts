@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { DrawerService } from 'ng-devui';
+import { Subscription } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { MenuData } from '../../../types/global';
@@ -14,28 +15,37 @@ import { SideMenuComponent } from '../side-menu/side-menu.component';
   styleUrls: ['./overall-layout.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OverallLayoutComponent implements OnDestroy {
+export class OverallLayoutComponent implements OnInit, OnDestroy {
   layoutConfig = this.layoutsService.getLayoutConfig();
   isSidebarShrink = false;
   isSidebarFold = false;
 
   menu: MenuData[] = this.menuService.menus;
-  menuSubject$ = this.menuService.change.subscribe(menu => (this.menu = menu));
-  layoutConfigSubject$ = this.layoutsService.layoutSubject$.subscribe(config => {
-    this.layoutConfig = config;
-    this.isSidebarShrink = config.sidebar.shrink;
-  });
+  menuSubject$?: Subscription;
+  layoutConfigSubject$?: Subscription;
 
   get siteInfo() {
     return environment.siteInfo;
   }
 
   // TODO: 浏览器窗口大小变化时，侧边栏收缩状态的变化
-  constructor(private drawerService: DrawerService, private layoutsService: LayoutsService, private menuService: MenuService) {}
+  constructor(private cdr: ChangeDetectorRef, private drawerService: DrawerService, private layoutsService: LayoutsService, private menuService: MenuService) {}
+
+  ngOnInit() {
+    this.menuSubject$ = this.menuService.change.subscribe(menu => {
+      this.menu = menu;
+      this.cdr.detectChanges();
+    });
+    this.layoutConfigSubject$ = this.layoutsService.layoutSubject$.subscribe(config => {
+      this.layoutConfig = config;
+      this.isSidebarShrink = config.sidebar.shrink;
+      this.cdr.detectChanges();
+    });
+  }
 
   ngOnDestroy(): void {
-    this.layoutConfigSubject$.unsubscribe();
-    this.menuSubject$.unsubscribe();
+    this.layoutConfigSubject$?.unsubscribe();
+    this.menuSubject$?.unsubscribe();
   }
 
   // 监听浏览器窗口大小变化后，侧边栏收缩状态的变化

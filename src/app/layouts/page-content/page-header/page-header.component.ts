@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { MenuData } from '../../../../types/global';
 import { MenuService } from '../../../core/services/menu.service';
 
 interface BreadcrumbItem {
@@ -25,42 +24,18 @@ export class PageHeaderComponent implements OnInit {
   constructor(private router: Router, private menuService: MenuService) {}
 
   ngOnInit(): void {
-    this.buildBreadcrumb(this.menuService.menus, this.router.url);
+    this.menuService.buildBreadcrumb(this.breadcrumbList, this.router.url);
     this.breadcrumbList.unshift({ title: '', link: '/', icon: 'icon-homepage' });
     if (this.titleIcon.length === 0) {
       this.titleIcon = this.breadcrumbList[this.breadcrumbList.length - 1].icon || '';
     }
-  }
-
-  buildBreadcrumb(menus: MenuData[], currentUrl: string): boolean {
-    // 如果没有菜单数据，直接返回
-    if (menus.length === 0) {
-      return false;
-    }
-
-    for (const menu of menus) {
-      // 如果有子菜单，递归查找，否则直接比较
-      if (menu.children) {
-        // 如果找到了，直接返回
-        if (this.buildBreadcrumb(menu.children, currentUrl)) {
-          this.breadcrumbList.unshift({ title: menu.title, icon: menu.menuIcon });
-          return true;
-        }
-      } else {
-        // 如果找到了，直接返回
-        if (menu.link === currentUrl) {
-          // 如果没有主动传入标题，使用菜单标题
-          if (this.title.length === 0) {
-            this.title = menu.title;
-          }
-
-          this.breadcrumbList.unshift({ title: menu.title, icon: menu.menuIcon });
-          return true;
-        }
+    if (this.breadcrumbList.length > 1) {
+      if (this.titleIcon.length === 0) {
+        this.titleIcon = this.breadcrumbList[this.breadcrumbList.length - 1].icon || '';
+      }
+      if (this.title.length === 0) {
+        this.title = this.breadcrumbList[this.breadcrumbList.length - 1].title || '';
       }
     }
-
-    // 如果全部都没有找到，返回false
-    return false;
   }
 }

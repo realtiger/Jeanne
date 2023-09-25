@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, share } from 'rxjs';
 
-import { MenuData } from '../../../types/global';
+import { BreadcrumbItem, MenuData } from '../../../types/global';
 
 @Injectable({ providedIn: 'root' })
 export class MenuService implements OnDestroy {
@@ -46,5 +46,36 @@ export class MenuService implements OnDestroy {
 
   ngOnDestroy(): void {
     this._change$.unsubscribe();
+  }
+
+  buildBreadcrumb(menuList: BreadcrumbItem[], currentUrl: string, menus: MenuData[] | null = null): boolean {
+    if (menus === null) {
+      menus = [...this.menus];
+    }
+
+    // 如果没有菜单数据，直接返回
+    if (menus.length === 0) {
+      return false;
+    }
+
+    for (const menu of menus) {
+      // 如果有子菜单，递归查找，否则直接比较
+      if (menu.children) {
+        // 如果找到了，直接返回
+        if (this.buildBreadcrumb(menuList, currentUrl, menu.children)) {
+          menuList.unshift({ title: menu.title, icon: menu.menuIcon });
+          return true;
+        }
+      } else {
+        // 如果找到了，直接返回
+        if (menu.link === currentUrl) {
+          menuList.unshift({ title: menu.title, icon: menu.menuIcon });
+          return true;
+        }
+      }
+    }
+
+    // 如果全部都没有找到，返回false
+    return false;
   }
 }

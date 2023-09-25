@@ -162,7 +162,9 @@ export class RoleManagerComponent {
             break;
           }
         }
-        this.permissionsPage = value.pagination;
+        if (value.pagination) {
+          this.permissionsPage = value.pagination;
+        }
         this.cdr.detectChanges();
       }
     });

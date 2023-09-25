@@ -340,7 +340,9 @@ export class UserManagerComponent {
     this.userManagerService.getUserList(listParams).subscribe(res => {
       this.loading = false;
       this.userList = res.items;
-      this.pager = res.pagination;
+      if (res.pagination) {
+        this.pager = res.pagination;
+      }
       this.cdr.detectChanges();
     });
   }
@@ -632,7 +634,9 @@ export class UserManagerComponent {
             break;
           }
         }
-        this.rolesPage = value.pagination;
+        if (value.pagination) {
+          this.rolesPage = value.pagination;
+        }
         this.cdr.detectChanges();
       }
     });

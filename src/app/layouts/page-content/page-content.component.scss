@@ -1,0 +1,28 @@
+@import "ng-devui/styles-var/devui-var.scss";
+
+d-row {
+  font-size: 16px;
+
+  d-col {
+    color: #00000080;
+
+    &:first-child {
+      div {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: right;
+
+        &:after {
+          content: ':';
+          margin: 0 8px 0 2px;
+        }
+      }
+    }
+  }
+}
+
+.list-header-operation {
+  display: flex;
+  justify-content: space-between;
+}
